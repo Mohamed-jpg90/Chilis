@@ -78,14 +78,13 @@ object-fit: cover;
   /* border: 1px solid black; */
 }
 .card-body {
-  /* border: 1px solid black; */
+
   width: 500px;
 }
 .header_text_cart{
     text-align: center;
     height: 100%;
-  /* border: 1px solid black; */
-    /* margin: auto; */
+
     
 }
 .the_addresses{
