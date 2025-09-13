@@ -1,3 +1,6 @@
+
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 import React, { useState, useEffect } from 'react';
 import './Profile.css';
 import { Link } from 'react-router-dom';
@@ -5,6 +8,8 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import Swal from 'sweetalert2';
 import NaveBare from './NaveBare';
+import LoadingButton from '@mui/lab/LoadingButton';
+import { useCartAddresses } from '../store/CartStore';
 
 const URL = "https://myres.me/chilis-dev/api";
 
@@ -30,8 +35,17 @@ function Profile() {
   const [Apartment, setApartment] = useState('')
   const [addName, setAddName] = useState('')
   const [other, setOther] = useState(false)
-
+  const [loading, setLoading] = useState(false)
   const [errMessage, setErrMessage] = useState('')
+
+
+
+    const addnewadd = useCartAddresses((state) => state.addAddress)
+    const addresscontainer = useCartAddresses((state) => state.address)
+  const [selectAddressStyle, setSelectAddressStyle] = useState(addresscontainer?.id || null )
+const clearAddress =useCartAddresses((state)=> state.cleerAddress )
+
+    
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -94,10 +108,12 @@ function Profile() {
       !Apartment?.trim() ||
       !addName?.trim()
     ) {
-      setErrMessage("You should complete all requirements.");
+      // setErrMessage("You should complete all requirements.");
+      toast.error("You should complete all requirements.")
       return;
     }
     else {
+      setLoading(true)
       try {
         const Basicurl = `${URL}/profile/address/add?area=${area}&street=${street}&building=${bulding}&floor=${floor}&apt=${Apartment}&name=${addName}&lat=20.222222&lng=30.333333&api_token=${token}`
         console.log("Basicurl:", Basicurl);
@@ -121,6 +137,8 @@ function Profile() {
       } catch (e) {
         console.error("Error adding address:", e);
         setErrMessage("Failed to add address. Please try again.");
+      } finally {
+        setLoading(false)
       }
     }
 
@@ -172,9 +190,15 @@ function Profile() {
             setAddressMessage(prev => prev.filter(addr => addr.id != x))
             toast.success('Address Removed Successfully')
 
-            // هنا لو عايز تحدث القائمة بعد الحذف
-            // refreshAddressList();
+          if (addresscontainer?.id === x || selectAddressStyle === x) {
+            clearAddress();
+
+            setSelectAddressStyle(null); 
+    
           }
+
+          }
+       
         } catch (e) {
           console.log("the error is :", e);
           Swal.fire("Error", "Something went wrong while deleting!", "error");
@@ -183,13 +207,33 @@ function Profile() {
     });
   };
 
-  return (
+  /////////////////////
   
+    const handeleChooseAddress = (item) => {
+    const theSelectedAddress = {
+      id: item.id,
+      address: item.address,
+      name: item.name
+    }
+    addnewadd(theSelectedAddress)
+    setSelectAddressStyle(item.id)
+  }
+  
+  ////////////////////////
+
+  return (
+
+
     <div className='container_feedBack'>
-        {/* <NaveBare/> */}
+      <div className="navprofilebar">
+        <NaveBare token={token} />
+
+      </div>
+
+
       <div className="testimonial">
         <div className="profile">
-           <div className="avatar"></div>
+          <div className="avatar"></div>
         </div>
 
         <div className={token ? 'quote' : 'donot_show'}>
@@ -202,24 +246,19 @@ function Profile() {
         <p className={token ? 'donot_show' : 'error2'}>
           You don't have an account yet.
         </p>
-          {/* <div className={token ? 'token' : 'donot_show'}>
-          <Link to='/' className='butttton'>Home Page</Link>
- 
-        </div> */}
+
 
         <div onClick={handleAddress} className='address_sec'>
           <h2 className='arow'> &gt; </h2>
-          <h3>Addresses</h3>
+          <h4>Addresses</h4>
           <p>Add or remove addresses</p>
         </div>
       </div>
 
       <div className='container_button'>
         <div className={token ? 'token' : 'donot_show'}>
-          <Link to='/' className='the_button'>Home Page</Link>
           <Link to='/edit-profile' className='the_button'>Edit profile</Link>
           <Link to='/change-password' className='the_button'>Change password</Link>
-          <button onClick={handleLogout} className='the_button'>Logout</button>
         </div>
 
         <div className={token ? 'donot_show' : 'token'}>
@@ -229,9 +268,9 @@ function Profile() {
       </div>
 
       {popUp && (
-        <div className="overlay" onClick={()=>setPopUp(false)}>
-          <div className="modal" role="document" onClick={(e)=>e.stopPropagation()} >
-            <div className="modal-header">
+        <div className="overlay" onClick={() => setPopUp(false)}>
+          <div className="myModal" role="document" onClick={(e) => e.stopPropagation()} >
+            <div className="modal_header">
               <h2> Addresses </h2>
               <button
                 className="close-btn"
@@ -241,7 +280,7 @@ function Profile() {
                 &times;
               </button>
             </div>
-            <div className="modal-body">
+            <div className="modal_body">
 
               <div>
 
@@ -249,12 +288,16 @@ function Profile() {
                   <p className="no-address">You have no addresses yet.</p>
                 ) : (
                   addressMessage.map((msg) => (
-                    <div key={msg.id}>
+      <div key={msg.id} className={`the_addresses ${selectAddressStyle === msg.id ? 'active_address ' : ''} `} onClick={() => handeleChooseAddress(msg)} >
                       <p className='topOfTheMessage'>
                         {msg.name}
                         <button
                           className="close-btn delet_add"
-                          onClick={() => handeleDelet(msg.id)}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handeleDelet(msg.id)
+
+                          }}
                         >
                           &times;
                         </button>
@@ -279,20 +322,20 @@ function Profile() {
       )}
 
       {addAddress && (
-        <div className="overlay">
-          <div className="modal" role="document">
-            <div className="modal-header">
+        <div className="overlay" onClick={() => handleAddress()} >
+          <div className="myModal" role="document" onClick={(e) => e.stopPropagation()}>
+            <div className="modal_header">
               <h2>Add Addresses</h2>
               <p className={errMessage ? 'error2' : 'donot_show'} > {errMessage} </p>
               <button
                 className="close-btn"
                 aria-label="Close popup"
                 onClick={() => {
-                   setPopUp(true)
+                  setPopUp(true)
                   setAddAddress(false)
 
                 }
-                 
+
                 }
               >
                 &times;
@@ -301,7 +344,7 @@ function Profile() {
 
 
             <form onSubmit={addNewAddress}>
-              <div className="modal-body">
+              <div className="modal_body">
                 <p className="lable">City</p>
                 <select className="form_AddAddress" required defaultValue="" value={city} onChange={(e) => {
 
@@ -368,26 +411,26 @@ function Profile() {
 
 
 
-                    <button type="button" onClick={() => {
-                      setOther(true);
-                      setAddName("");
-                    }}>Other</button>
+                  <button type="button" onClick={() => {
+                    setOther(true);
+                    setAddName("");
+                  }}>Other</button>
 
 
+                </div>
+
+                {other && (
+                  <div>
+                    <p className="lable">other</p>
+
+                    <input
+                      type="text"
+                      required
+                      value={addName}
+                      onChange={(e) => setAddName(e.target.value)} className='form_AddAddress'
+                    />
                   </div>
-
-                  {other && (
-                    <div>
-                      <p className="lable">other</p>
-
-                      <input
-                        type="text"
-                        required
-                        value={addName}
-                        onChange={(e) => setAddName(e.target.value)} className='form_AddAddress'
-                      />
-                    </div>
-                  )}
+                )}
 
               </div>
 
@@ -397,12 +440,35 @@ function Profile() {
                   className="btn-secondary"
                   onClick={() => {
                     setAddAddress(false)
-                  setPopUp(true)
+                    setPopUp(true)
                   }}
                 >
                   Cancel
                 </button>
-                <button type="submit">Add Address</button>
+
+                <LoadingButton
+                  type="submit"
+                  size="small"
+                  loading={loading}
+                  // loadingIndicator="Loading…"
+                  variant="outlined"
+                  className='the_button2'
+                  sx={{
+                    backgroundColor: "#f44336",
+                    color: "#fff",
+                    border: "none",
+                    padding: "8px 14px",
+                    borderRadius: "8px",
+                    fontWeight: "500",
+                    cursor: "pointer",
+                    border: "2px solid #f44336",
+                    transition: "background 0.2s ease"
+
+                  }}
+                >
+                  Add Address
+                </LoadingButton>
+                {/* <button type="submit">Add Address</button> */}
               </div>
             </form>
           </div>

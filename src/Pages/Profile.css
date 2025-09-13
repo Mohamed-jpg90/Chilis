@@ -69,17 +69,8 @@
       color: #777;
     }
 
-    .quote {
-      font-size: 1.2rem;
-      color: black;
-      line-height: 1.5;
-      padding-right: 20px;
-      
-    }
 
-.quote p{
-    margin-top: 20px;
-}
+
 
 .the_button{
     background-color: #f44336;
@@ -174,11 +165,13 @@
 }
 
 
-.modal {
+.myModal {
   background: #fff;
   padding: 13px 24px;
   border-radius: 14px;
-  width: min(700px, 70%);
+  width: min(700px, 70%); 
+    
+
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
   max-height: 90vh;    
   overflow-y: auto; 
@@ -189,14 +182,14 @@
 }
 
 /* Modal header - title + close button */
-.modal-header {
+.modal_header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 12px;
 }
 
-.modal-header h2 {
+.modal_header h2 {
   margin: 0;
   font-size: 1.25rem;
   font-weight: 600;
@@ -219,7 +212,7 @@
 }
 
 /* Body text */
-.modal-body {
+.modal_body {
   margin-top: 14px;
   font-size: 0.95rem;
   color: #444;
@@ -283,15 +276,16 @@
   background-color: #f44336d3;
   border-radius: 0px;
   color: #fff;
-  /* margin-top: 20px;   */
+  margin-top: -16px;  
+  margin-bottom: 0px;
 }
 
 .topOfTheMessage{
     padding: 7px 10px;
   background-color: #7777776b;
-  border-radius: 0px;
+  /* border-radius: 0px; */
   color: #fff;
-  margin-top: 20px;
+  /* margin-top: 20px; */
   position: relative;
 }
 
@@ -396,15 +390,11 @@ color: white;
 .butttton2:hover{
   background-color: #e5e7eb;
 
+
 }
-
-
-
-
-
-
-
-
+.navprofilebar{
+  margin-bottom: 50px;
+}
 
 
 
@@ -438,6 +428,17 @@ color: white;
       .quote {
         font-size: 0.85rem;
       }
+.the_button{
+
+
+  
+padding: 10px 0px;
+    width: 300px;
+ font-size: 0.70rem;
+    font-weight: 700;
+    text-decoration: none;
+
+}
     }
 
     @media (max-width: 480px) {

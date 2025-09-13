@@ -1,8 +1,11 @@
 import React, { useState } from 'react'
+import Button from '@mui/material/Button';
+
 import './EditProfile.css'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 import toast from 'react-hot-toast'
+
 import { FaArrowRight } from "react-icons/fa";
 
 const URL = 'https://myres.me/chilis-dev/api'
@@ -18,6 +21,7 @@ function EditProfile() {
   const [email, setEmail] = useState(emailValue)
   const [phone, setPhone] = useState(phoneValue)
   const [changed, setChanged] = useState(false)
+  const [loading , setLoading] =useState(false)
 
   const handleEdit = async () => {
     if (!changed) {
@@ -37,6 +41,7 @@ function EditProfile() {
       toast.error(" invalid phone numper ")
     }
 else{
+    setLoading(true)
  try {
       const res = await axios.post(
         `${URL}/profile/update?name=${name}&phone=${phone}&email=${email}&referral=chi2021&api_token=${token}`
@@ -62,6 +67,8 @@ else{
     } catch (e) {
       console.error("The error is:", e)
       setErrorMessage("Failed to update profile")
+    }finally{
+      setLoading(false)
     }
 }
    
@@ -123,9 +130,35 @@ else{
             }}
           />
 
-          <button onClick={handleEdit} className='the_button2'>
+                   <Button
+                      size="small"
+                      onClick={() => { handleEdit() }}
+                      loading={loading}
+                      // loadingIndicator="Loading…"
+                      variant="outlined"
+                      className='the_button2'
+                      sx={{
+                        marginTop: "30px",
+                        backgroundColor: "#f44336",
+                        border: 0,
+                        borderRadius: "15px",
+                        padding: "13px 10px",
+                        cursor: "pointer",
+                        transition: "0.5s",
+                        border: "3px solid #f44336",
+                        color: "white",
+                        fontWeight: 900,
+                        fontSize: "15px",
+                     
+                      }}
+                    >
+                      Update
+          
+                    </Button>
+
+          {/* <button onClick={handleEdit} className='the_button2'>
             Update
-          </button>
+          </button> */}
         </div>
       </div>
     </div>
