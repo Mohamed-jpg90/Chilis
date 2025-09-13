@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import './Home.css';
-import img1 from '../images/logo.png';
+
 import './NaveBare'
 
 
@@ -11,7 +11,7 @@ import NaveBare from './NaveBare';
 import { useLocation } from 'react-router-dom';
 import videoSrc from '../images/WhatsApp Video 2025-08-24 at 16.11.29_46f4fdd1.mp4'
 import Footer from './Footer';
-import img3 from '../images/aboutus.jpg'
+import img3 from '../images/aboutUs.jpg'
 import ScrollToTop from './ScrollToTop';
 // import bootstrap form 'bootstra'
 
