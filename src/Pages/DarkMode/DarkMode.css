@@ -1,0 +1,31 @@
+:root {
+  --body_background: white;
+  --body_color: black;
+}
+
+[data-theme="dark"] {
+  --body_background: #121212;
+  --body_color: #ffffff;
+}
+
+
+
+.dark-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  transition: transform 0.3s ease;
+}
+
+.dark-toggle:hover {
+  transform: scale(1.2);
+}
+
+.icon.sun {
+  color: #fbc02d; /* أصفر للشمس */
+}
+
+.icon.moon {
+  color: #90caf9; /* أزرق للقمر */
+}

@@ -1,21 +1,20 @@
 import React, { useState } from 'react';
-import './Regester.css';
+import '../App.css'
 import axios from 'axios';
 import Profile from './Profile';
 import Home from './Home2';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import Button from '@mui/material/Button';
 import NaveBare from './NaveBare';
+import LoadingButton from '@mui/lab/LoadingButton';
+import { useTranslation } from 'react-i18next';
 
 const URL = "https://myres.me/chilis-dev/api";
 
 function Regester({ onLoginSuccess }) {
-
   const navigate = useNavigate();
-   const token = localStorage.getItem('token');
-
+  const token = localStorage.getItem('token');
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -26,40 +25,31 @@ function Regester({ onLoginSuccess }) {
   const [showProfile, setShowProfile] = useState(!!localStorage.getItem('token'))
   const [loading, setLoading] = useState(false)
 
+  const { t, i18n } = useTranslation();
+  const currentLanguage = i18n.language;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!email || !password || !fullName || !number) {
-      toast.error("You must complete all fildes")
+      toast.error(t('Register.completeAllFields'))
       setCorrect(false)
     }
     else if (password.length < 6) {
-      setErrorMessage("The password should include at lest 6 cracters")
-      toast.error("The password should include at lest 6 cracters")
-
+      setErrorMessage(t('Register.passwordLength'))
+      toast.error(t('Register.passwordLength'))
       setCorrect(false)
-
     } else if (!email.includes('@') || !email.includes('.')) {
-      // setErrorMessage("the emaile should include '@' or '.'")
-      toast.error("the emaile should include '@' or '.'")
-
+      toast.error(t('Register.invalidEmail'))
       setCorrect(false)
-
     } else if (fullName.length < 2) {
-      // setErrorMessage("The full name should be bigger than 2 cracter ")
-      toast.error("The full name should be bigger than 2 cracter ")
-
+      toast.error(t('Register.nameLength'))
     } else if (isNaN(number)) {
-      toast.error("The phone number contains letters or invalid characters. ")
-
-
+      toast.error(t('Register.invalidPhone'))
     }
     else {
       setLoading(true)
-
       try {
-
-
         const res = await axios.post(`${URL}/register?first_name=${fullName}&email=${email}&password=${password}&phone=${number}`)
 
         const user = res.data.data.user;
@@ -78,13 +68,11 @@ function Regester({ onLoginSuccess }) {
         setShowProfile(true);
         setErrorMessage('')
         setCorrect(true)
-        // window.location.reload()
-        toast.success("account created successfuly")
+        toast.success(t('Register.success'))
         onLoginSuccess(token)
         navigate('/')
 
       } catch (err) {
-
         const res = await axios.post(`${URL}/register`, null, {
           params: {
             first_name: fullName,
@@ -93,71 +81,61 @@ function Regester({ onLoginSuccess }) {
             phone: number
           }
         });
-        
+
         console.log(res.data.messages)
         setCorrect(false);
         if (res.data.messages) {
           toast.error(res.data.messages[0])
         } else {
-          setErrorMessage('Registration failed. Please try again.');
+          setErrorMessage(t('Register.failed'));
         }
       } finally {
         setLoading(false)
       }
-
     };
   }
 
-
-
-
   return (
-    <div className='regester'>
+    <div className='regester' dir={currentLanguage === 'ar' ? 'rtl' : 'ltr'}>
 
-
-         <div className="navprofilebar">
-      <NaveBare token={token} />
-
+      <div className="navprofilebar">
+        <NaveBare token={token} />
       </div>
       <div className='container2'>
-        {/* {!correct && <p className="error">{errorMessage}</p>} */}
-
         <div className='the_regester' >
-          <h2 className='header2'>Create Account</h2>
+          <h2 className='header2'>{t('Register.title')}</h2>
           <input
             type='text'
-            placeholder='Full Name'
+            placeholder={t('Register.fullNamePlaceholder')}
             className='user_name'
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
           />
           <input
             type='text'
-            placeholder='Phone'
+            placeholder={t('Register.phonePlaceholder')}
             className='user_num'
             value={number}
             onChange={(e) => setNumber(e.target.value)}
           />
           <input
             type='email'
-            placeholder='Email address'
+            placeholder={t('Register.emailPlaceholder')}
             className='user_email'
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
           <input
             type='password'
-            placeholder='Password'
+            placeholder={t('Register.passwordPlaceholder')}
             className='user_password'
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-
-          <Button
+          <LoadingButton
             size="small"
             onClick={handleSubmit}
             loading={loading}
-            // loadingIndicator="Loading…"
             variant="outlined"
             className='the_button2'
             sx={{
@@ -171,20 +149,22 @@ function Regester({ onLoginSuccess }) {
               border: "3px solid #f44336",
               color: "white",
               fontWeight: 900,
-              fontSize: "15px",
-
+              fontSize: {
+                xs: "10px",
+                sm: "14px",
+                md: "15px",
+              },
             }}
           >
-            Create Account
+            {t('Register.createAccountButton')}
+          </LoadingButton>
 
-          </Button>
-
-
-          {/* <button onClick={handleSubmit} className='the_button2'>
-            Create Account
-          </button> */}
-
-          <p className='button7'> I have an account <Link to={'/LogIn'} className='link7' >Log In</Link> </p>
+          <p className='button7'>
+            {t('Register.haveAccount')} 
+            <Link to={'/LogIn'} className='link7'>
+              {t('Register.loginLink')}
+            </Link>
+          </p>
         </div>
       </div>
     </div>

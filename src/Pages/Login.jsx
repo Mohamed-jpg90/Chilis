@@ -1,71 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import Button from '@mui/material/Button';
-
-import './Regester.css';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import Home2 from './Home2';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-
 import NaveBare from './NaveBare';
+import { useTranslation } from 'react-i18next';
 
 const URL = "https://myres.me/chilis-dev/api";
 
-
-
 function Login({ onLoginSuccess }) {
-
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
-
-
+  
   const [correct, setCorrect] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [showProfile, setShowProfile] = useState(!!localStorage.getItem('token'));
+  const [loading, setLoading] = React.useState(false);
 
+  const { t, i18n } = useTranslation();
+  const currentLanguage = i18n.language;
 
   const HandelLogIn = async (e) => {
-    // e.preventDefault();
-
     if (email === '' || password === '') {
-
-
-      toast.error("You must complete all fields.")
+      toast.error(t('Login.completeAllFields'))
       setCorrect(false);
-
     }
     else if (!email.includes('@') || !email.includes('.')) {
-
-
-      setErrorMessage("Email must include '@' and '.'");
-      toast.error("Email must include '@' and '.'")
-
+      setErrorMessage(t('Login.invalidEmail'));
+      toast.error(t('Login.invalidEmail'))
       setCorrect(false);
-
     }
     else if (password.length < 6) {
-
-
-      toast.error("Password must be at least 6 characters.")
-
+      toast.error(t('Login.passwordLength'))
       setCorrect(false);
-
     }
     else {
-        setCorrect(true)
-        setLoading(true)
+      setCorrect(true)
+      setLoading(true)
       try {
         const res = await axios.post(`${URL}/login?password=${password}&email=${email}`);
 
         if (res.data.messages) {
           setCorrect(false)
-
           toast.error(Array.isArray(res.data.messages) ? res.data.messages.join(', ') : res.data.messages);
-
-
         }
         else {
           console.log(res.data.data)
@@ -76,28 +57,18 @@ function Login({ onLoginSuccess }) {
 
           const token = res.data.data.token;
           localStorage.setItem('token', token);
-
-          // toast.success("Login successful ");
-
+          
           setErrorMessage('');
           setEmail('')
           setPassword('')
 
-
-          toast.success("login successfuly ")
+          toast.success(t('Login.success'))
           onLoginSuccess(token)
-
-          //  window.location.reload();
-
           navigate('/')
         }
-
-
       } catch (err) {
-
-
         console.log("the error is :", err)
-      }finally{
+      } finally {
         setLoading(false)
       }
     };
@@ -109,33 +80,18 @@ function Login({ onLoginSuccess }) {
     }
   }, []);
 
-
-
-  const [loading, setLoading] = React.useState(false);
-  // React.useEffect(() => {
-  //   const timeout = setTimeout(() => {
-  //     setLoading(false);
-  //   }, 1000);
-  //   return () => clearTimeout(timeout);
-  // });
-
-
   return (
-
-    <div className='regester'>
-         <div className="navprofilebar">
-      <NaveBare token={token} />
-
+    <div className='regester' dir={currentLanguage === 'ar' ? 'rtl' : 'ltr'}>
+      <div className="navprofilebar">
+        <NaveBare token={token} />
       </div>
       <div className='container2'>
         <div className='the_regester'>
-          <h2 className='header'>Log In</h2>
-          {/* <p className={!correct ? 'error' : 'not_regester'}>{errorMessage}</p> */}
-
+          <h2 className='header'>{t('Login.title')}</h2>
 
           <input
             type='text'
-            placeholder='Email'
+            placeholder={t('Login.emailPlaceholder')}
             className='user_name'
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -148,23 +104,21 @@ function Login({ onLoginSuccess }) {
 
           <input
             type='password'
-            placeholder='Password'
+            placeholder={t('Login.passwordPlaceholder')}
             className='user_password'
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
-                HandelLogIn(e);   // نفس الفنكشن بتاعة الزرار
+                HandelLogIn(e);
               }
             }}
           />
-
 
           <Button
             size="small"
             onClick={() => { HandelLogIn() }}
             loading={loading}
-            // loadingIndicator="Loading…"
             variant="outlined"
             className='the_button2'
             sx={{
@@ -178,21 +132,22 @@ function Login({ onLoginSuccess }) {
               border: "3px solid #f44336",
               color: "white",
               fontWeight: 900,
-              fontSize: "15px",
-           
+              fontSize: {
+                xs: "10px",
+                sm: "14px",
+                md: "15px",
+              },
             }}
           >
-            Log In
-
+            {t('Login.loginButton')}
           </Button>
-          {/* 
-          <button onClick={HandelLogIn}  className='the_button2'>
-            Log In
-          </button> */}
 
-          <p className='button7'> I don't have account <Link to={'/Regester'} className='link7' >create on</Link> </p>
-
-
+          <p className='button7'>
+            {t('Login.noAccount')} 
+            <Link to={'/Regester'} className='link7'>
+              {t('Login.createAccount')}
+            </Link>
+          </p>
         </div>
       </div>
     </div>

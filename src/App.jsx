@@ -13,8 +13,15 @@ import EditProfile from './Pages/EditProfile';
 import ChangePassword from './Pages/ChangePassword';
 import { useEffect,useState } from 'react';
 import NaveBare from './Pages/NaveBare';
+import Location from './Pages/Location';
+
+
 
 import Cart from './Pages/Cart';
+
+
+import "./i18n"
+
 function App() {
 
  
@@ -33,10 +40,11 @@ function App() {
 
         <Route path='/Profile'  element= { token? <Profile/> : <Navigate to={'/'} replace/> } />
       <Route path='/Regester'  element={ !token ?  <Regester onLoginSuccess={handleLoginSuccess} /> :<Navigate to={'/'} replace/>} />
-      <Route path='/Login'  element={!token ? <Login onLoginSuccess={handleLoginSuccess} /> : <Navigate to={'/'} replace/> } />
-      <Route path='/edit-profile'  element={<EditProfile/> } />
-      <Route path='/change-password'  element={<ChangePassword/> } />
+      <Route path='/Login'  element={  <Login onLoginSuccess={handleLoginSuccess} />  } />
+      <Route path='/edit-profile'  element={ token ? <EditProfile/> :<Navigate to={'/'} replace/> } />
+      <Route path='/change-password'  element={ token ? <ChangePassword/> : <Navigate to={'/'} replace/> } />
       <Route path='/Cart'  element={<Cart/> } />
+      <Route path='/Location' element= {<Location/>}/>
       
 
      </Routes>

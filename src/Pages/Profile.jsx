@@ -1,8 +1,5 @@
-
 import 'bootstrap/dist/css/bootstrap.min.css';
-
 import React, { useState, useEffect } from 'react';
-import './Profile.css';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -10,9 +7,11 @@ import Swal from 'sweetalert2';
 import NaveBare from './NaveBare';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useCartAddresses } from '../store/CartStore';
+import { FaRegTrashAlt } from "react-icons/fa";
+import LogInAgain from './LogInAgain';
+import { useTranslation } from 'react-i18next';
 
 const URL = "https://myres.me/chilis-dev/api";
-
 
 function Profile() {
   const user_name = localStorage.getItem('user_name');
@@ -25,7 +24,6 @@ function Profile() {
   const [addressMessage, setAddressMessage] = useState([])
   const [cityNameId, setCityNameId] = useState([])
   const [areaContainer, setAreaContainer] = useState([])
-  const [addressName, setAddressName] = useState('')
 
   const [city, setCity] = useState('')
   const [area, setArea] = useState('')
@@ -36,41 +34,52 @@ function Profile() {
   const [addName, setAddName] = useState('')
   const [other, setOther] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [errMessage, setErrMessage] = useState('')
+  const [errMessage, setErrMessage] = useState(false)
 
+  const addnewadd = useCartAddresses((state) => state.addAddress)
+  const addresscontainer = useCartAddresses((state) => state.address)
+  const [selectAddressStyle, setSelectAddressStyle] = useState(addresscontainer?.id || null)
+  const clearAddress = useCartAddresses((state) => state.cleerAddress)
 
+  const { t, i18n } = useTranslation()
+  const currentLanguage = i18n.language;
 
-    const addnewadd = useCartAddresses((state) => state.addAddress)
-    const addresscontainer = useCartAddresses((state) => state.address)
-  const [selectAddressStyle, setSelectAddressStyle] = useState(addresscontainer?.id || null )
-const clearAddress =useCartAddresses((state)=> state.cleerAddress )
-
-    
+  // Helper function to get display name based on current language
+  const getDisplayName = (item) => {
+    return currentLanguage === 'ar' && item.namear ? item.namear : item.name;
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     window.location.reload();
   };
 
-
   const fetchAddresses = async () => {
     try {
       const res = await axios.get(`${URL}/profile/address?api_token=${token}`);
-      const addresses = res.data.data.address.map(addr => ({
-        name: addr.address_name,
-        address: addr.address1,
-        id: addr.id
-      }));
-      setAddressMessage(addresses);
+      if(res.data.response == false ){
+        if(res.data.message === "Invalid Token" ) {
+          localStorage.removeItem("token")
+          setErrMessage(true)
+        }
+        else toast.error(t('Profile.somethingWrong'))
+      }
+      else{
+        const addresses = res.data.data.address.map(addr => ({
+          name: addr.address_name,
+          address: addr.address1,
+          id: addr.id
+        }));
+        setAddressMessage(addresses);
+      }
     } catch (e) {
       console.log("the error is :", e);
     }
   };
+
   useEffect(() => {
     fetchAddresses();
   }, []);
-
-
 
   const handleAddress = async (e) => {
     setPopUp(true)
@@ -82,21 +91,17 @@ const clearAddress =useCartAddresses((state)=> state.cleerAddress )
     setAddAddress(true)
     try {
       const res = await axios.get(`${URL}/cities`)
-
       const x = res.data.data.cities.map(city => ({
         name: city.name_en,
+        namear: city.name_ar,
         id: city.id
       }))
-
       setCityNameId(x)
-
-      //  console.log(res.data.data.cities[0].name_en)
     } catch (e) {
       console.log("the error :", e)
     }
-
-
   }
+
   const addNewAddress = async (e) => {
     e.preventDefault()
 
@@ -108,8 +113,7 @@ const clearAddress =useCartAddresses((state)=> state.cleerAddress )
       !Apartment?.trim() ||
       !addName?.trim()
     ) {
-      // setErrMessage("You should complete all requirements.");
-      toast.error("You should complete all requirements.")
+      toast.error(t('Profile.completeAllRequirements'))
       return;
     }
     else {
@@ -128,38 +132,33 @@ const clearAddress =useCartAddresses((state)=> state.cleerAddress )
         setFloor("");
         setApartment("");
         setAddName("");
-        setErrMessage("");
+        setErrMessage(false);
 
         setAddAddress(false);
         await fetchAddresses()
-        toast.success('add success')
+        toast.success(t('Profile.addSuccess'))
         setPopUp(true)
       } catch (e) {
         console.error("Error adding address:", e);
-        setErrMessage("Failed to add address. Please try again.");
       } finally {
         setLoading(false)
       }
     }
-
   };
 
   const handeleCity = async (x) => {
-    // console.log(x);
     try {
       const res = await axios.get(`${URL}/areas?city=${x}`);
-
       const mes = res.data.data.areas.map((area) => ({
         name: area.area_name_en,
+        namear: area.area_name_ar,
         id: area.id
       }))
       setAreaContainer(mes)
-
     } catch (e) {
       console.log("the error is :", e);
     }
   };
-
 
   const handeleDelet = async (x) => {
     const swalWithBootstrapButtons = Swal.mixin({
@@ -171,12 +170,12 @@ const clearAddress =useCartAddresses((state)=> state.cleerAddress )
     });
 
     swalWithBootstrapButtons.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      title: t('Profile.deleteConfirmTitle'),
+      text: t('Profile.deleteConfirmText'),
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "No, cancel!",
+      confirmButtonText: t('Profile.deleteConfirm'),
+      cancelButtonText: t('Profile.deleteCancel'),
       reverseButtons: true
     }).then(async (result) => {
       if (result.isConfirmed) {
@@ -186,30 +185,23 @@ const clearAddress =useCartAddresses((state)=> state.cleerAddress )
           );
 
           if (res.data.data.message == "Address Removed Successfully") {
-
             setAddressMessage(prev => prev.filter(addr => addr.id != x))
-            toast.success('Address Removed Successfully')
+            toast.success(t('Profile.deleteSuccess'))
 
-          if (addresscontainer?.id === x || selectAddressStyle === x) {
-            clearAddress();
-
-            setSelectAddressStyle(null); 
-    
+            if (addresscontainer?.id === x || selectAddressStyle === x) {
+              clearAddress();
+              setSelectAddressStyle(null);
+            }
           }
-
-          }
-       
         } catch (e) {
           console.log("the error is :", e);
-          Swal.fire("Error", "Something went wrong while deleting!", "error");
+          Swal.fire(t('Profile.error'), t('Profile.deleteError'), "error");
         }
       }
     });
   };
 
-  /////////////////////
-  
-    const handeleChooseAddress = (item) => {
+  const handeleChooseAddress = (item) => {
     const theSelectedAddress = {
       id: item.id,
       address: item.address,
@@ -218,18 +210,12 @@ const clearAddress =useCartAddresses((state)=> state.cleerAddress )
     addnewadd(theSelectedAddress)
     setSelectAddressStyle(item.id)
   }
-  
-  ////////////////////////
 
   return (
-
-
-    <div className='container_feedBack'>
+    <div className='container_feedBack' dir={currentLanguage === 'ar' ? 'rtl' : 'ltr'}>
       <div className="navprofilebar">
         <NaveBare token={token} />
-
       </div>
-
 
       <div className="testimonial">
         <div className="profile">
@@ -237,33 +223,31 @@ const clearAddress =useCartAddresses((state)=> state.cleerAddress )
         </div>
 
         <div className={token ? 'quote' : 'donot_show'}>
-          {/* <p>id: {user_id}</p> */}
-          <p>Name: {user_name}</p>
-          <p>Email: {user_email}</p>
-          <p>Phone: {user_phone}</p>
+          <p>{t('Profile.name')}: {user_name}</p>
+          <p>{t('Profile.email')}: {user_email}</p>
+          <p>{t('Profile.phone')}: {user_phone}</p>
         </div>
 
         <p className={token ? 'donot_show' : 'error2'}>
-          You don't have an account yet.
+          {t('Profile.noAccount')}
         </p>
 
-
         <div onClick={handleAddress} className='address_sec'>
-          <h2 className='arow'> &gt; </h2>
-          <h4>Addresses</h4>
-          <p>Add or remove addresses</p>
+          <h2 className={ currentLanguage == 'en'? `arow ` : 'arowAR' }  > &gt; </h2>
+          <h4>{t('Profile.addresses')}</h4>
+          <p>{t('Profile.addOrRemove')}</p>
         </div>
       </div>
 
       <div className='container_button'>
         <div className={token ? 'token' : 'donot_show'}>
-          <Link to='/edit-profile' className='the_button'>Edit profile</Link>
-          <Link to='/change-password' className='the_button'>Change password</Link>
+          <Link to='/edit-profile' className='the_button'>{t('Profile.editProfile')}</Link>
+          <Link to='/change-password' className='the_button'>{t('Profile.changePassword')}</Link>
         </div>
 
         <div className={token ? 'donot_show' : 'token'}>
-          <Link to='/Login' className='the_button'>Log In</Link>
-          <Link to='/Regester' className='the_button'>Register</Link>
+          <Link to='/Login' className='the_button'>{t('Profile.login')}</Link>
+          <Link to='/Regester' className='the_button'>{t('Profile.register')}</Link>
         </div>
       </div>
 
@@ -271,7 +255,7 @@ const clearAddress =useCartAddresses((state)=> state.cleerAddress )
         <div className="overlay" onClick={() => setPopUp(false)}>
           <div className="myModal" role="document" onClick={(e) => e.stopPropagation()} >
             <div className="modal_header">
-              <h2> Addresses </h2>
+              <h2> {t('Profile.addresses')} </h2>
               <button
                 className="close-btn"
                 aria-label="Close popup"
@@ -281,25 +265,22 @@ const clearAddress =useCartAddresses((state)=> state.cleerAddress )
               </button>
             </div>
             <div className="modal_body">
-
               <div>
-
                 {addressMessage.length === 0 ? (
-                  <p className="no-address">You have no addresses yet.</p>
+                  <p className="no-address">{t('Profile.noAddresses')}</p>
                 ) : (
                   addressMessage.map((msg) => (
-      <div key={msg.id} className={`the_addresses ${selectAddressStyle === msg.id ? 'active_address ' : ''} `} onClick={() => handeleChooseAddress(msg)} >
+                    <div key={msg.id} className={`the_addresses ${selectAddressStyle === msg.id ? 'active_address ' : ''} `} onClick={() => handeleChooseAddress(msg)} >
                       <p className='topOfTheMessage'>
                         {msg.name}
                         <button
-                          className="close-btn delet_add"
+                          className={currentLanguage=="en"? "close-btn delet_add":"close-btn delet_addAR" }
                           onClick={(e) => {
                             e.stopPropagation()
                             handeleDelet(msg.id)
-
                           }}
                         >
-                          &times;
+                          <FaRegTrashAlt className='text-dark fs-5 ' />
                         </button>
                       </p>
                       <p className='AddressMessage'>{msg.address}</p>
@@ -307,14 +288,13 @@ const clearAddress =useCartAddresses((state)=> state.cleerAddress )
                   ))
                 )}
               </div>
-
             </div>
             <div className="modal-actions">
               <button className="btn-secondary" onClick={() => setPopUp(false)}>
-                Cancel
+                {t('Profile.cancel')}
               </button>
               <button onClick={handeleAddAddress} >
-                ADD
+                {t('Profile.add')}
               </button>
             </div>
           </div>
@@ -325,7 +305,7 @@ const clearAddress =useCartAddresses((state)=> state.cleerAddress )
         <div className="overlay" onClick={() => handleAddress()} >
           <div className="myModal" role="document" onClick={(e) => e.stopPropagation()}>
             <div className="modal_header">
-              <h2>Add Addresses</h2>
+              <h2>{t('Profile.addAddresses')}</h2>
               <p className={errMessage ? 'error2' : 'donot_show'} > {errMessage} </p>
               <button
                 className="close-btn"
@@ -333,105 +313,85 @@ const clearAddress =useCartAddresses((state)=> state.cleerAddress )
                 onClick={() => {
                   setPopUp(true)
                   setAddAddress(false)
-
-                }
-
-                }
+                }}
               >
                 &times;
               </button>
             </div>
 
-
             <form onSubmit={addNewAddress}>
               <div className="modal_body">
-                <p className="lable">City</p>
+                <p className="lable">{t('Profile.city')}</p>
                 <select className="form_AddAddress" required defaultValue="" value={city} onChange={(e) => {
-
-
                   const selectID = e.target.value
                   setCity(selectID)
                   setArea("")
                   handeleCity(selectID)
-                }
-                } >
+                }} >
                   <option value="" disabled>
-                    Select city
+                    {t('Profile.selectCity')}
                   </option>
                   {cityNameId.map((mes) => (
-                    <option key={mes.id} value={mes.id} >{mes.name}</option>
+                    <option key={mes.id} value={mes.id} >{getDisplayName(mes)}</option>
                   ))}
                 </select>
 
-                <p className="lable">Area</p>
+                <p className="lable">{t('Profile.area')}</p>
                 <select className="form_AddAddress form_add2" required defaultValue="" value={area} onChange={(e) => {
                   const ar = e.target.value
                   setArea(ar)
-
                   console.log(ar)
-                }
-                } disabled={!city} >
+                }} disabled={!city} >
                   <option value="" disabled>
-                    Select area
+                    {t('Profile.selectArea')}
                   </option>
                   {areaContainer.map((mes) => (
-
-                    <option key={mes.id} value={mes.id} >{mes.name}</option>
-
+                    <option key={mes.id} value={mes.id} >{getDisplayName(mes)}</option>
                   ))}
                 </select>
 
-                <p className="lable">Street</p>
+                <p className="lable">{t('Profile.street')}</p>
                 <input type="text" className="form_AddAddress" required value={street} onChange={(e) => setStreet(e.target.value)} />
 
-
-                <p className="lable">Building</p>
+                <p className="lable">{t('Profile.building')}</p>
                 <input type="text" className="form_AddAddress" required value={bulding} onChange={(e) => setBulding(e.target.value)} />
 
-                <p className="lable">Floor</p>
+                <p className="lable">{t('Profile.floor')}</p>
                 <input type="text" className="form_AddAddress" required value={floor} onChange={(e) => setFloor(e.target.value)} />
 
-                <p className="lable">Apartment</p>
+                <p className="lable">{t('Profile.apartment')}</p>
                 <input type="text" className="form_AddAddress" required value={Apartment} onChange={(e) => setApartment(e.target.value)} />
 
-
-
                 <div className='home_work_other' >
-
                   <button type="button" onClick={() => {
                     setAddName("")
                     setAddName("Home")
                     setOther(false)
-                  }}>Home</button>
+                  }}>{t('Profile.home')}</button>
                   <button type="button" onClick={() => {
                     setAddName("")
                     setAddName("Work")
                     setOther(false)
-                  }}>Work</button>
-
-
-
+                  }}>{t('Profile.work')}</button>
                   <button type="button" onClick={() => {
                     setOther(true);
                     setAddName("");
-                  }}>Other</button>
-
-
+                  }}>{t('Profile.other')}</button>
                 </div>
 
                 {other && (
                   <div>
-                    <p className="lable">other</p>
-
+                    <p className="lable">{t('Profile.other')}</p>
                     <input
                       type="text"
                       required
                       value={addName}
-                      onChange={(e) => setAddName(e.target.value)} className='form_AddAddress'
+                      onChange={(e) => setAddName(e.target.value)} 
+                      className='form_AddAddress'
+                      placeholder={t('Profile.enterAddressName')}
                     />
                   </div>
                 )}
-
               </div>
 
               <div className="modal-actions">
@@ -443,14 +403,13 @@ const clearAddress =useCartAddresses((state)=> state.cleerAddress )
                     setPopUp(true)
                   }}
                 >
-                  Cancel
+                  {t('Profile.cancel')}
                 </button>
 
                 <LoadingButton
                   type="submit"
                   size="small"
                   loading={loading}
-                  // loadingIndicator="Loading…"
                   variant="outlined"
                   className='the_button2'
                   sx={{
@@ -463,23 +422,21 @@ const clearAddress =useCartAddresses((state)=> state.cleerAddress )
                     cursor: "pointer",
                     border: "2px solid #f44336",
                     transition: "background 0.2s ease"
-
                   }}
                 >
-                  Add Address
+                  {t('Profile.addAddress')}
                 </LoadingButton>
-                {/* <button type="submit">Add Address</button> */}
               </div>
             </form>
           </div>
         </div>
       )}
 
-
-
+      {errMessage && (
+        <LogInAgain/>
+      )}
     </div>
   );
 }
 
 export default Profile;
-
