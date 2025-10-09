@@ -36,7 +36,7 @@ function MenueSec() {
     const currentLanguage = i18n.language;
 
 
-    
+
     const fetchMenu = async () => {
         try {
             const res = await axios.get(`${URL}/menu/10/1`);
@@ -94,7 +94,7 @@ function MenueSec() {
             const itemData = res.data;
             const price = itemData.info[0].price.price || 0;
 
-  
+
             const extras = itemData?.item_extras?.[0]?.data?.map((item) => ({
                 id: item.id,
                 name: item.name_en,
@@ -104,7 +104,7 @@ function MenueSec() {
                 image: `https://myres.me/chilis/${item.image}`
             })) || [];
 
-   
+
             const options = itemData.info?.[0]?.item_extras?.[0]?.data?.map((item) => ({
                 id: item.id,
                 name: item.name_en,
@@ -140,7 +140,7 @@ function MenueSec() {
         const product = {
             id: item.id,
             // name: currentLanguage === 'ar' ? item.namear : item.name,
-            name : item.name,
+            name: item.name,
             namear: item.namear,
             price: item.price,
             quantity: quantity,
@@ -165,7 +165,7 @@ function MenueSec() {
     const getDisplayDescription = (item) => {
         return currentLanguage === 'ar' && item.descriptionar ? item.descriptionar : item.description;
     };
-///////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
     return (
         <div className='menuSec' id="menu">
             <div className='container_sec_menu'>
@@ -185,6 +185,8 @@ function MenueSec() {
                             <div className="custom-next"><FaChevronCircleRight /></div>
 
                             <Swiper
+                                key={i18n.language} // ✅ Force reinit when language changes
+                                dir={i18n.language === 'ar' ? 'rtl' : 'ltr'} // ✅ Set direction
                                 spaceBetween={30}
                                 slidesPerView={1}
                                 autoplay={false}
@@ -192,27 +194,26 @@ function MenueSec() {
                                     nextEl: '.custom-next',
                                     prevEl: '.custom-prev',
                                 }}
-                                loop={false}
+                                loop={true}
                                 modules={[Autoplay, Pagination, Navigation]}
                                 breakpoints={{
                                     1024: { slidesPerView: 3 },
                                     600: { slidesPerView: 1 },
                                 }}
                             >
-                                {menuData.map(mes => {
-                                    return (
-                                        <SwiperSlide key={mes.id}>
-                                            <div className='item1' onClick={() => gitItem(mes.id)}>
-                                                <div className="image2">
-                                                    <LazyLoadImage alt={getDisplayName(mes)} src={mes.image} effect='blur' />
-                                                </div>
-                                                <div className='the_content'>
-                                                    <h4>{getDisplayName(mes)}</h4>
-                                                </div>
+                                {menuData.map(mes => (
+                                    <SwiperSlide key={mes.id}>
+                                        <div className='item1' onClick={() => gitItem(mes.id)}>
+                                            <div className="image2">
+                                                <LazyLoadImage alt={getDisplayName(mes)} src={mes.image} effect='blur' />
                                             </div>
-                                        </SwiperSlide>
-                                    );
-                                })}
+                                            <div className='the_content'>
+                                                <h4>{getDisplayName(mes)}</h4>
+                                            </div>
+                                            
+                                        </div>
+                                    </SwiperSlide>
+                                ))}
                             </Swiper>
                         </div>
                     )
@@ -238,8 +239,8 @@ function MenueSec() {
                                             <LazyLoadImage alt={getDisplayName(item)} src={item.image} effect='blur' />
                                         </div>
                                         <div className='the_content'>
-                                            <div className="itmeName"> 
-                                                <h6>{getDisplayName(item)}</h6> 
+                                            <div className="itmeName">
+                                                <h6>{getDisplayName(item)}</h6>
                                             </div>
                                             <div className="">
                                                 <h6>{item.price} {t('menu.egp')}</h6>

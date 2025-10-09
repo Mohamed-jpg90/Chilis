@@ -272,6 +272,15 @@
     border: none;
     padding: 10px 20px;
   }
+
+  .bar {
+  width: 25px;
+  height: 3px;
+  background-color: gray;
+  margin: 3px 0;
+  transition: 0.3s;
+}
+
 }
 
 @media screen and (max-width: 480px) {

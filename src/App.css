@@ -5,6 +5,13 @@
   font-family: "Cabin", sans-serif;
 }
 
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 /* //////////////////////////////////////////////////// */
 /* light and dark mode  */
 
@@ -384,6 +391,15 @@ label {
     border-radius: 15px;
   }
 
+  .text_box h1 {
+    color: var(--text_light);
+    font-size: 40px;
+  }
+
+  .section2 {
+    height: 500px;
+  }
+
   .container_section2 {
     width: 95%;
     margin: auto;
@@ -395,9 +411,6 @@ label {
     padding: 10px 10px;
   }
 
-  .section2 {
-    height: 90vh;
-  }
 
   .AboutUsImage {
     display: none;
@@ -556,14 +569,15 @@ input:focus {
     font-size: 13px;
     padding: 8px;
   }
+
   .the_regester {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  max-width: 500px;
-  padding: 10px 30px;
-  margin: 20px 0;
-}
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 500px;
+    padding: 10px 30px;
+    margin: 20px 0;
+  }
 
 
   .the_button2 {
@@ -903,6 +917,16 @@ input:focus {
     width: 84%;
   }
 
+  .item1 {
+
+    /* background-color: var(--item_background); */
+    /* border-radius: 12px; */
+    /* cursor: pointer; */
+    width: 95%;
+    border: 1px solid var(--item_border);
+    margin: auto;
+  }
+
   .custom-prev {
     left: -35px;
   }
@@ -932,6 +956,65 @@ input:focus {
   to {
     transform: translateY(0) scale(1);
     opacity: 1;
+  }
+}
+
+
+
+/* Responsive Design */
+@media (max-width: 750px) {
+  .myModal2 {
+    padding: 20px;
+    max-width: 90%;
+  }
+
+  .items_of_menu {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+
+  .modal_header2 {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+
+  .price_conter {
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+     justify-content: space-between;
+     width: 90%;
+     margin: auto;
+  }
+
+.item_imgae_popUp {
+  width: 98% ;
+  height: 150px;
+}
+
+  .modal-actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .myModal2 {
+    padding: 16px;
+  }
+
+  .modal_header2 h2 {
+    font-size: 1.2rem;
+  }
+
+  .item_imgae_popUp img {
+    height: 140px;
+  }
+
+  .optinnnnnn {
+    padding: 10px 12px;
   }
 }
 
@@ -1061,13 +1144,14 @@ input:focus {
 .arow {
   position: absolute;
   top: 50%;
-  /* right: ; */
+  
   animation: moveLeftRight 0.5s infinite alternate;
   color: var(--body_color);
   transform: translate(0px, -50%);
 }
-.arowAR{
-    position: absolute;
+
+.arowAR {
+  position: absolute;
   top: 50%;
   right: 0px;
   transform: translate(0px, -50%);
@@ -1304,6 +1388,7 @@ input:focus {
   transform: translate(0, -50%);
   color: var(--primary_color);
 }
+
 .delet_addAR {
   position: absolute;
   right: 90%;
@@ -1355,6 +1440,17 @@ input:focus {
   .container_feedBack {
     padding: 1rem;
   }
+  .myModal {
+
+  padding: 13px 20px;
+  border-radius: 12px;
+width: 90%;
+
+}
+.home_work_other {
+  width: 90%;
+
+}
 
   .testimonials {
     flex-direction: column;
@@ -1436,7 +1532,7 @@ input:focus {
 .navbarLinksProfile {
   color: var(--text_muted);
   text-decoration: none;
-  
+
 }
 
 .navbarLinksProfile:hover {
@@ -1570,6 +1666,6 @@ input:focus {
 
 
 /* ///////////////// */
-.close-btn:hover{
-background-color: transparent;
+.close-btn:hover {
+  background-color: transparent;
 }
