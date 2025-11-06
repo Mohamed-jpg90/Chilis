@@ -14,13 +14,9 @@ import ChangePassword from './Pages/ChangePassword';
 import { useEffect,useState } from 'react';
 import NaveBare from './Pages/NaveBare';
 import Location from './Pages/Location';
-
-
-
 import Cart from './Pages/Cart';
-
-
 import "./i18n"
+import MyOrder from './Pages/MyOrder';
 
 function App() {
 
@@ -37,7 +33,6 @@ function App() {
      <BrowserRouter>
        <Routes>
       <Route path='/'  element={<Home2/> } />
-
         <Route path='/Profile'  element= { token? <Profile/> : <Navigate to={'/'} replace/> } />
       <Route path='/Regester'  element={ !token ?  <Regester onLoginSuccess={handleLoginSuccess} /> :<Navigate to={'/'} replace/>} />
       <Route path='/Login'  element={  <Login onLoginSuccess={handleLoginSuccess} />  } />
@@ -45,7 +40,7 @@ function App() {
       <Route path='/change-password'  element={ token ? <ChangePassword/> : <Navigate to={'/'} replace/> } />
       <Route path='/Cart'  element={<Cart/> } />
       <Route path='/Location' element= {<Location/>}/>
-      
+      <Route path='/myOrder' element={ <MyOrder/> }/>
 
      </Routes>
 

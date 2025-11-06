@@ -19,9 +19,15 @@ import { persist } from "zustand/middleware";
             item.id === id ? { ...item, quantity } : item
           ),
         })),
+        updateNote: (id, note) =>
+        set((state) => ({
+          cart: state.cart.map((item) =>
+            item.id === id ? { ...item, special: note } : item
+          ),
+        })),
     }),
     {
-      name: "cartItem", // ✅ لازم string
+      name: "cartItem", 
     }
   )
 );

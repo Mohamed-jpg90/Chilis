@@ -104,7 +104,8 @@
     "addAddress": "إضافة العنوان",
     "completeRequirements": "يجب إكمال جميع المتطلبات.",
     "addSuccess": "تم إضافة العنوان بنجاح",
-    "somethingWrong": "حدث خطأ ما"
+    "somethingWrong": "حدث خطأ ما",
+    "orderCreated" : " تم الطلب بنجاح "
   },
     "ChangePassword": {
     "title": "تغيير كلمة المرور",
@@ -174,6 +175,7 @@
     "logOut": "تسجيل خروج",
     "logIn": "تسجيل دخول",
     "signUp": "إنشاء حساب",
-    "language": "اللغة"
+    "language": "اللغة",
+     "MyOrder" :  "طلباتي السابقة"
   }
 }

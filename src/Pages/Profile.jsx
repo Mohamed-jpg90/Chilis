@@ -280,7 +280,7 @@ function Profile() {
                             handeleDelet(msg.id)
                           }}
                         >
-                          <FaRegTrashAlt className='text-dark fs-5 ' />
+                          <FaRegTrashAlt className=' fs-5 ' style={{color:"black"}}  />
                         </button>
                       </p>
                       <p className='AddressMessage'>{msg.address}</p>

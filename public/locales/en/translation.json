@@ -57,7 +57,8 @@
     "deleteSuccess": "Address removed successfully",
     "error": "Error",
     "deleteError": "Something went wrong while deleting!",
-    "somethingWrong": "Something went wrong"
+    "somethingWrong": "Something went wrong",
+    "orderCreated" : " the order has been Created successful "
   },
 
     "Location": {
@@ -173,7 +174,8 @@
     "logOut": "Log out",
     "logIn": "Log In",
     "signUp": "Sign Up",
-    "language": "Language"
+    "language": "Language",
+    "MyOrder" : "My Order"
   }
 
 

@@ -118,6 +118,7 @@ function MenueSec() {
                 name: itemData.name_en,
                 namear: itemData.name_ar,
                 id: itemData.id,
+                infoID: itemData?.info[0]?.id,
                 image: `https://myres.me/chilis/${itemData.image}`,
                 description: itemData.description_en,
                 descriptionar: itemData.description_ar,
@@ -138,8 +139,9 @@ function MenueSec() {
 
     const handelAddToCart = (item) => {
         const product = {
-            id: item.id,
+            id: Math.random(),
             // name: currentLanguage === 'ar' ? item.namear : item.name,
+            infoID: item.infoID,
             name: item.name,
             namear: item.namear,
             price: item.price,
@@ -147,13 +149,16 @@ function MenueSec() {
             option: item.options.find((opt) => opt.id === selectedOption) || null,
             extras: item.extras.filter((ex) => selectedExtras.includes(ex.id)) || [],
             image: item.image,
-            des: currentLanguage === 'ar' ? item.descriptionar : item.description
+            des: currentLanguage === 'ar' ? item.descriptionar : item.description,
+            special: ""
         };
 
         addToCart(product);
         setShowPupUp(false);
         console.log("Added to cart:", product);
         console.log(cart)
+        setSelectedExtras([]);
+        setSelectedOption(null);
     };
     /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -181,12 +186,22 @@ function MenueSec() {
                         </div>
                     ) : (
                         <div className='container_herzontal'>
-                            <div className="custom-prev"><FaChevronCircleLeft /></div>
-                            <div className="custom-next"><FaChevronCircleRight /></div>
+                            {currentLanguage === 'ar' ? (
+                                <>
+                                    <div className="custom-prev"><FaChevronCircleLeft /></div>
+                                    <div className="custom-next"><FaChevronCircleRight /></div>
+
+                                </>
+                            ) : (
+                                <>
+                                    <div className="custom-prev"><FaChevronCircleLeft /></div>
+                                    <div className="custom-next"><FaChevronCircleRight /></div>
+                                </>
+                            )}
 
                             <Swiper
-                                key={i18n.language} // ✅ Force reinit when language changes
-                                dir={i18n.language === 'ar' ? 'rtl' : 'ltr'} // ✅ Set direction
+                                key={i18n.language}
+                                dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
                                 spaceBetween={30}
                                 slidesPerView={1}
                                 autoplay={false}
@@ -198,7 +213,8 @@ function MenueSec() {
                                 modules={[Autoplay, Pagination, Navigation]}
                                 breakpoints={{
                                     1024: { slidesPerView: 3 },
-                                    600: { slidesPerView: 1 },
+                                    700: { slidesPerView: 2 },
+                                    500: { slidesPerView: 1 },
                                 }}
                             >
                                 {menuData.map(mes => (
@@ -210,7 +226,7 @@ function MenueSec() {
                                             <div className='the_content'>
                                                 <h4>{getDisplayName(mes)}</h4>
                                             </div>
-                                            
+
                                         </div>
                                     </SwiperSlide>
                                 ))}

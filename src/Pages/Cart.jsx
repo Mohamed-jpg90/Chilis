@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import NaveBare from './NaveBare';
-import imag7 from '../images/london.jpg'
+
 import imag8 from '../images/logo.png'
 import Button from '@mui/material/Button';
 import { useCartStore } from '../store/CartStore';
@@ -13,10 +13,12 @@ import { useCartAddresses } from '../store/CartStore';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { FaBlackTie } from 'react-icons/fa';
 import LogInAgain from './LogInAgain';
+import Order from './Order';
 
 function Cart() {
   const [loading, setLoading] = useState(false)
   const cart = useCartStore((state) => state.cart)
+  const updateNote = useCartStore((state) => state.updateNote)
   const removeFromCart = useCartStore((state) => state.removeFromTheCart)
   const updateQuantity = useCartStore((state) => state.updateCart)
   const [token, setToken] = useState(localStorage.getItem('token'));
@@ -46,6 +48,15 @@ function Cart() {
 
   const [brachs, setBranchs] = useState([])
   const [SelectedBranch, setSelectedBranch] = useState('')
+
+  const [theShop, setTheShop] = useState('')
+
+
+  const cleare = useCartStore((state) => state.clearProducts)
+  const [orederID, setOrderID] = useState("")
+
+
+
 
   const { t, i18n } = useTranslation();
   const currentLanguage = i18n.language;
@@ -77,7 +88,7 @@ function Cart() {
       try {
         const res = await axios.get(`${URL}/profile/address?api_token=${token}`);
         if (res.data.response == false) {
-          if (res.data.message === "Invalid Token"){
+          if (res.data.message === "Invalid Token") {
             localStorage.removeItem("token")
             setErrMessage(true)
           }
@@ -205,6 +216,64 @@ function Cart() {
   }, [])
 
   ///////////////////////////////////////////////////
+
+
+  const handelOrder = async () => {
+
+    if (pickup && !SelectedBranch) {
+      toast.error("you must Select Branch");
+      return;
+    } else {
+
+
+      const deliveryType = pickup ? 2 : 1;
+      const itemsData = {
+        items: cart.map((item) => ({
+
+          id: item.infoID,
+          choices: [],
+          extras: item.extras.map((ex) => ex.id),
+          options: item.option ? [item.option.id] : [],
+          count: item.quantity,
+          special: item.special || ""
+        }))
+      };
+      const itemsString = JSON.stringify(itemsData);
+      const orderUrl = `${URL}/orders/create?delivery_type=${deliveryType}&payment=1&lat=0&lng=0&address=${addresscontainer?.id}&area=10&branch=${SelectedBranch || 2}&items=${itemsString}&device_id=&notes=&time=&car_model=&car_color=&gift_cards=&coins=0.00&api_token=${token}`;
+
+      try {
+        setLoading(true);
+        const res = await axios.post(orderUrl);
+        if (res.data.response === false) {
+          if (res.data.message === "Invalid Token") {
+            localStorage.removeItem("token");
+            setErrMessage(true);
+          } else {
+            toast.error(t('Cart.somethingWrong'));
+          }
+        } else {
+          toast.success(t('Cart.orderCreated'));
+          setOrderID(res.data.data.order_id);
+          console.log(res?.data?.data)
+          cleare(); // امسح السلة بعد النجاح
+        }
+
+
+      } catch (e) {
+        console.log("Order error:", e);
+        toast.error("Something went wrong while creating the order");
+      } finally {
+        setLoading(false);
+      }
+
+
+    }
+
+
+  }
+
+
+  /////////////////////////////////////////////////
   return (
     <div className='cart_container' dir={currentLanguage === 'ar' ? 'rtl' : 'ltr'}>
       <div className="navprofilebar">
@@ -263,7 +332,7 @@ function Cart() {
             >
               <option value="" disabled>{t('Cart.selectBranch')}</option>
               {brachs.map((branch) => (
-                <option key={branch.id} value={branch.id}>
+                <option key={branch.id} value={branch.id} onClick={() => { setTheShop(brachs.id) }} >
                   {getDisplayName(branch)}
                 </option>
               ))}
@@ -273,7 +342,7 @@ function Cart() {
 
         <div className="items_products">
           <div className='cart_menu' >
-            <img src={imag8} alt='logo' style={{ maxWidth: "50px", marginRight: "10px" }} />  
+            <img src={imag8} alt='logo' style={{ maxWidth: "50px", marginRight: "10px" }} />
             <span> chili's </span>
           </div>
           <hr />
@@ -290,7 +359,7 @@ function Cart() {
                     <div className="">
                       <div className="card-body  " >
                         <div className='header_of_the_card'   >
-                          <div className='header_text_cart' > 
+                          <div className='header_text_cart' >
                             <h6 className="">{getDisplayName(item)}</h6>
                           </div>
                           <div className="counter">
@@ -345,7 +414,7 @@ function Cart() {
                               {item.extras.map((ee) => (
                                 <div key={ee.id} >
                                   <p>{getDisplayName(ee)}</p>
-                                  <p>{ee.price} {t('Cart.egp')}</p>
+                                  <p>{(ee.price) * (item.quantity)} {t('Cart.egp')}</p>
                                 </div>
                               ))}
                             </div>
@@ -354,7 +423,9 @@ function Cart() {
                         <input
                           placeholder={t('Cart.enterNote')}
                           type="text"
-                          style={{ marginTop: "8px", width: "100%", border: "1px solid black" }}
+                          style={{ marginTop: "5px", width: "100%", border: "1px solid black" }}
+                          value={item.special || ""}
+                          onChange={(e) => updateNote(item.id, e.target.value)}
                         />
                       </div>
                     </div>
@@ -362,7 +433,7 @@ function Cart() {
                 </div>
               ))
             ) : (
-              <p>{t('Cart.noItems')}</p>
+              <p style={{ textAlign: "center", fontSize: "20px" }} >{t('Cart.noItems')}</p>
             )}
           </div>
           <hr />
@@ -445,15 +516,15 @@ function Cart() {
 
               <Button
                 size="small"
-                onClick={() => { }}
+                onClick={handelOrder}
                 loading={loading}
-                disabled={cart.length === 0 || !token } 
+                disabled={cart.length === 0 || !token}
                 variant="outlined"
                 className='the_button2'
                 sx={{
                   width: "100%",
                   marginTop: "30px",
-                  backgroundColor: "#f44336",
+                  backgroundColor: cart.length === 0 ? "gray" : "#f44336", 
                   border: 0,
                   borderRadius: "15px",
                   padding: "13px 10px",
@@ -463,7 +534,8 @@ function Cart() {
                   color: "white",
                   fontWeight: 700,
                   fontSize: "14px",
-                  alignSelf: "center"
+                  alignSelf: "center",
+
                 }}
               >
                 {t('Cart.order')}
@@ -592,7 +664,7 @@ function Cart() {
                       type="text"
                       required
                       value={addName}
-                      onChange={(e) => setAddName(e.target.value)} 
+                      onChange={(e) => setAddName(e.target.value)}
                       className='form_AddAddress'
                       placeholder={t('Cart.enterAddressName')}
                     />

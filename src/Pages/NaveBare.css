@@ -149,6 +149,7 @@
   flex-direction: column;
   cursor: pointer;
   padding: 5px;
+  z-index: 10000;
 }
 
 .bar {
@@ -178,8 +179,9 @@
 
 .form-select {
   background-image: none !important; 
-  padding-right: 8px; /* ممكن تقلل المسافة اللي كانت للسهم */
+  padding-right: 8px; 
 }
+
 /* Maintain LTR layout for all languages */
 .nav-container, .nav-menu, .dropdown-container {
   direction: ltr !important;
@@ -188,12 +190,103 @@
 
 
 
+
+/* /////////////////////////////////////// */
+
+/* Language Dropdown Styles */
+.language_dropdown {
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.language_dropdown:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.language_dropdown_2 {
+  background-color: transparent;
+  border: 1px solid var(--text_muted);
+  color: var(--text_muted);
+}
+
+.language_dropdown_2:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-color: var(--text_muted);
+}
+
+.language-dropdown-container {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  z-index: 1000;
+}
+
+.language-dropdown {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  padding: 8px 0;
+  min-width: 140px;
+  list-style: none;
+  margin: 0;
+  border: 1px solid #e5e5e5;
+}
+
+.language-option {
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.language-option:hover {
+  background-color: #f8f9fa;
+  color: #007bff;
+}
+
+.language-option.active {
+  background-color: #e3f2fd;
+  
+  font-weight: 600;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .language-dropdown-icon {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+  
+  .language-dropdown {
+    min-width: 120px;
+    right: 0;
+    left: auto;
+  }
+}
+
+/* RTL Support */
+[dir="rtl"] .language-dropdown-container {
+  right: auto;
+  left: 0;
+}
+
+[dir="rtl"] .language-dropdown-icon {
+  text-align: right;
+}
+
+
+/* ////////////////////////////////////////////// */
+
+
+
 /* Responsive Design */
 @media screen and (max-width: 768px) {
   .nav-container {
     padding: 0 1rem;
-    position: fixed;
-    top: 10px;
+
   }
   .language_select2{
 
@@ -227,15 +320,16 @@
   .nav-menu {
     position: fixed;
 
-    left: -100%;
+    
+
     top: 0px;
     gap: 12px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: start;
     background-color: black;
-    width: 100%;
+    width: 60%;
     height: 100%;
     text-align: center;
     transition: 0.3s;
@@ -243,12 +337,32 @@
     color: #fff;
   }
 
-  .nav-menu.active {
-    left: 0;
+ 
+
+  .nav-menu[data-lang="en"] {
+    left: -100%;
+    right: auto;
   }
 
+  .nav-menu[data-lang="en"].active {
+    left: 0;
+    right: auto;
+  }
+
+  /* Arabic: right to left */
+  .nav-menu[data-lang="ar"] {
+    right: -100%;
+    left: auto;
+  }
+
+  .nav-menu[data-lang="ar"].active {
+    right: 0;
+    left: auto;
+  }
+
+
   .nav-item {
-    margin: 15px 0px;
+    margin: 7px 0px;
     text-align: center;
   }
 
@@ -277,11 +391,37 @@
   width: 25px;
   height: 3px;
   background-color: gray;
-  margin: 3px 0;
+  margin: 3px 0;  
   transition: 0.3s;
 }
 
 }
+
+
+
+.nav-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 998; /* Make sure it's below the nav menu but above other content */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.nav-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.nav-menu {
+  z-index: 999;
+}
+
+
+
 
 @media screen and (max-width: 480px) {
   .nav-container {
