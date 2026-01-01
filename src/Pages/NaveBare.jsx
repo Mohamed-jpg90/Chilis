@@ -70,6 +70,7 @@ function NaveBare({ token }) {
     };
   }, []);
 
+
   const cart = useCartStore((state) => state.cart);
 
   const changeLanguage = (lng) => {
@@ -84,6 +85,36 @@ function NaveBare({ token }) {
     document.documentElement.dir = 'ltr';
     document.documentElement.lang = i18n.language;
   }, [i18n.language]);
+
+
+
+
+  /// to disable scroll in mobile view 
+useEffect(() => {
+  if (isOpen) {
+ 
+    // نثبّت الجسم في مكانه
+    document.body.style.position = 'fixed';
+    document.body.style.overflow = 'hidden';
+
+  } else {
+
+    document.body.style.position = '';
+    document.body.style.overflow = '';
+
+  }
+
+  // لو اتقفل الكومبوننت لأي سبب
+  return () => {
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.overflow = '';
+  };
+}, [isOpen]);
+
+
 
   return (
 
@@ -130,7 +161,7 @@ function NaveBare({ token }) {
             </li>
 
             {/* Cart Icon */}
-            {token && window.location.pathname !== '/Cart' && (
+            {  window.location.pathname !== '/Cart' && (
               <li className="nav-item">
                 <div className="cartIcon">
                   <HashLink
@@ -252,7 +283,7 @@ function NaveBare({ token }) {
                               setIsDropDown(false);
                             }}
                           >
-                            {t('navbar.MyOrder') || "MY Order" }
+                            {t('navbar.MyOrder') || "MY Order"}
                           </Link>
                         </li>
                       )}
@@ -381,7 +412,20 @@ function NaveBare({ token }) {
                       </Link>
                     </li>
                   )}
-
+                      {window.location.pathname !== '/myOrder' && (
+                        <li>
+                          <Link
+                            to="/myOrder"
+                            className={`nav-link ${window.location.pathname !== '/' ? "navbarLinksProfile" : "custom-link"}`}
+                            onClick={() => {
+                              setIsOpen(false);
+                              setIsDropDown(false);
+                            }}
+                          >
+                            {t('navbar.MyOrder') || "MY Order"}
+                          </Link>
+                        </li>
+                      )}
 
                   <li className="nav-item">
                     <Link
@@ -390,6 +434,7 @@ function NaveBare({ token }) {
                         setIsOpen(false);
                       }}
                       className={`nav-link ${window.location.pathname !== '/' ? "navbarLinksProfile" : "custom-link"}`}
+                      style={{color:"#f44336"}}
                     >
                       {t('navbar.logOut')}
                     </Link>
@@ -399,7 +444,7 @@ function NaveBare({ token }) {
 
 
               {/* Cart Icon */}
-              {token && window.location.pathname !== '/Cart' && (
+              { window.location.pathname !== '/Cart' && (
                 <li className="nav-item">
                   <div className="cartIcon">
                     <HashLink
@@ -502,6 +547,7 @@ function NaveBare({ token }) {
             <div
               className={`hamburger ${isOpen ? "active" : ""}`}
               onClick={() => setIsOpen(!isOpen)}
+              style={{marginLeft:"55px"}}
             >
               <span
                 className="bar"

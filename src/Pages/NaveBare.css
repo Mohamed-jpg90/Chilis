@@ -1,3 +1,8 @@
+/* html, body {
+overflow:  hidden;
+} */
+
+
 .my-navbar {
   position: absolute;
   top: 0;
@@ -151,6 +156,7 @@
   padding: 5px;
   z-index: 10000;
 }
+
 
 .bar {
   width: 25px;
@@ -410,6 +416,7 @@
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease, visibility 0.3s ease;
+
 }
 .nav-overlay.active {
   opacity: 1;

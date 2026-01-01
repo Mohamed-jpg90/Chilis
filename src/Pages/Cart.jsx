@@ -49,14 +49,69 @@ function Cart() {
   const [brachs, setBranchs] = useState([])
   const [SelectedBranch, setSelectedBranch] = useState('')
 
-  const [theShop, setTheShop] = useState('')
+  const [theShop, setTheShop] = useState(0)
 
 
   const cleare = useCartStore((state) => state.clearProducts)
   const [orederID, setOrderID] = useState("")
+  const [tax3, setTax3] = useState('')
+  const [coupon, setCoupon] = useState("");
+  const [discount, setDiscount] = useState(0);
+  const [couponError, setCouponError] = useState("");
+  const [isLoadingCoupon, setIsLoadingCoupon] = useState(false);
+  const [cancel, setCancel] = useState(false)
+
+
+  const handleApplyCoupon = async () => {
+    if (!coupon.trim()) return;
+
+    try {
+      setIsLoadingCoupon(true);
+      setCouponError("");
+      const res = await axios.get(`${URL}/coupon/validation?coupon=${coupon}&api_token=${token}`)
+      if (res.data.message === "Invalid Token") {
+        localStorage.removeItem("token")
+        setErrMessage(true)
+      }
 
 
 
+      else if (res.data.message === "Invalid Code") {
+        setDiscount(0);
+        setCouponError("Invalid coupon");
+      }
+
+      else {
+        setDiscount(res.data.coupon.percentage);
+        setCouponError("");
+        setCancel(true)
+      }
+    } catch (err) {
+      setCouponError("Something went wrong");
+    } finally {
+      setIsLoadingCoupon(false);
+    }
+  };
+
+
+  const handleCancelCoupon = () => {
+    setCoupon("");
+    setDiscount(0);
+    setCouponError("");
+    setCancel(false)
+  };
+
+
+  const handel_tax = async () => {
+    try {
+      const res = await axios.get(`${URL}/settings`)
+      console.log(res.data.data.tax)
+      setTax3(res.data.data.settings.tax)
+    } catch (e) {
+      console.log("the error is ", e);
+
+    }
+  }
 
   const { t, i18n } = useTranslation();
   const currentLanguage = i18n.language;
@@ -74,9 +129,10 @@ function Cart() {
   }, 0);
 
   const deliveryFee = pickup ? 0 : 50;
-  const taxRate = 0.14;
-  const tax = subtotal * taxRate;
-  const total = subtotal + deliveryFee + tax;
+  const taxRate = tax3 / 100;
+  const tax2 = subtotal * taxRate;
+  const totalDidscount = (subtotal + deliveryFee + tax2)* (discount/100)
+  const total = (subtotal + deliveryFee + tax2) - totalDidscount || 0 ;
 
   //////////////////////////////////////////////////////
   const fetchAddresses = async () => {
@@ -110,6 +166,8 @@ function Cart() {
 
   useEffect(() => {
     fetchAddresses();
+    handel_tax()
+
   }, []);
 
   ///////////////////////////////////////////////////////////
@@ -437,6 +495,81 @@ function Cart() {
             )}
           </div>
           <hr />
+          {/* ////////////////////////////////////////////////////////////////////////////////////////////////// */}
+
+          <div className='coupon_section'>
+            <input
+              type="text"
+              placeholder='Enter Your Coupon'
+              style={{ marginTop: "5px", width: "80%", border: "1px solid black" }}
+              value={coupon}
+              onChange={(e) => {
+                setCoupon(e.target.value)
+                setCancel(false)
+              }
+              }   // مهم جداً
+            />
+
+            {/* APPLY button: يظهر لو طول الكوبون أقل من 1 */}
+            {!cancel && (
+              <Button
+                size="small"
+                loading={loading}
+                onClick={handleApplyCoupon}
+                variant="outlined"
+                className='the_button2'
+                sx={{
+                  width: "20%",
+                  marginTop: "-2px",
+                  backgroundColor: "#f44336",
+                  border: "3px solid #f44336",
+                  color: "white",
+                  fontWeight: 700,
+                  borderRadius: "0px",
+                  padding: "8px 8px",
+                  cursor: "pointer",
+                  transition: "0.5s",
+                }}
+              >
+                {t('Apply')}
+              </Button>
+            )}
+
+            {/* CANCEL button: يظهر لو طول الكوبون أكبر من 1 */}
+            {cancel && (
+              <Button
+                size="small"
+                onClick={handleCancelCoupon}
+                variant="outlined"
+                sx={{
+                  width: "20%",
+                  marginTop: "-2px",
+                  backgroundColor: "gray",
+                  border: "3px solid gray",
+                  color: "white",
+                  fontWeight: 700,
+                  borderRadius: "0px",
+                  padding: "8px 8px",
+                  cursor: "pointer",
+                  transition: "0.5s",
+                }}
+              >
+                {t('cancel')}
+              </Button>
+            )}
+
+            {couponError && <p style={{ color: "red" }}>{couponError}</p>}
+            {discount > 0 && (
+              <p style={{ color: "red" }}>
+                {`you have ${discount}% discount`}
+              </p>
+            )}
+
+          </div>
+          <br />
+
+          {/* ////////////////////////////////////////////////////////////////////////////////////////////////////////// */}
+
           <div className='item_total_price'>
             <div className='Select_delivery_type' >
               <h5>{t('Cart.selectDeliveryType')}</h5>
@@ -478,9 +611,14 @@ function Cart() {
                   </div>
                 )}
                 <div>
-                  <p>{t('Cart.tax')} {Math.floor(taxRate * 100)}%</p>
-                  <p>{tax.toFixed(2)} {t('Cart.egp')}</p>
+                  <p>{t('Cart.tax')} {Math.floor(tax3)}%</p>
+                  <p>{tax2.toFixed(2)} {t('Cart.egp')}</p>
                 </div>
+{/*        
+                          <div>
+                  <p>{t('Cart.coupon')} </p>
+                  <p>{Math.floor(discount)}%</p>
+                </div> */}
                 <hr />
                 <div>
                   <h4>{t('Cart.total')}</h4>
@@ -524,7 +662,7 @@ function Cart() {
                 sx={{
                   width: "100%",
                   marginTop: "30px",
-                  backgroundColor: cart.length === 0 ? "gray" : "#f44336", 
+                  backgroundColor: cart.length === 0 ? "gray" : "#f44336",
                   border: 0,
                   borderRadius: "15px",
                   padding: "13px 10px",

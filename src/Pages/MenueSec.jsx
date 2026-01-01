@@ -14,7 +14,8 @@ import { FaChevronCircleRight } from "react-icons/fa";
 import { FaChevronCircleLeft } from "react-icons/fa";
 import { useTranslation } from 'react-i18next'; // Fixed import
 
-const URL = "https://myres.me/chilis-dev/api"
+const URL = "https://myres.me/chilis-dev/api";
+
 
 function MenueSec() {
     const cart = useCartStore((state) => state.cart);
@@ -154,7 +155,11 @@ function MenueSec() {
         };
 
         addToCart(product);
-        setShowPupUp(false);
+
+        // setTimeout(() => {
+        //     setShowPupUp(false);
+        // }, 1000);
+        setShowPupUp(false)
         console.log("Added to cart:", product);
         console.log(cart)
         setSelectedExtras([]);
@@ -242,7 +247,7 @@ function MenueSec() {
                         </div>
                     ) : (
                         <>
-                            <div className='back_to_menu' >
+                            <div className='back_to_menu ' style={{ direction: "ltr" }}  >
                                 <IoArrowBackOutline className='back' onClick={Backtomenu} />
                             </div>
                             <div className='catigory_of_item' >

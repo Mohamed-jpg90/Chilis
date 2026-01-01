@@ -9,7 +9,10 @@ import Footer from './Footer';
 import img3 from '../images/aboutUs.jpg'
 import ScrollToTop from './ScrollToTop';
 
+
 import Cookies from 'js-cookie'
+import { MdAddToDrive } from 'react-icons/md';
+import AddToCartSuccess from './AddToCartSuccess';
 function Home2() {
   const location = useLocation();
   const [token, setToken] = useState(localStorage.getItem('token'))
@@ -28,6 +31,7 @@ useEffect(()=>{
       <div className="sec1">
         <NaveBare token={token} />
         <ScrollToTop />
+        <AddToCartSuccess/>
 
         <video src={videoSrc} autoPlay loop muted playsInline></video>
 

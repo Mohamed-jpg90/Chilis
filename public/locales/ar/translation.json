@@ -177,5 +177,40 @@
     "signUp": "إنشاء حساب",
     "language": "اللغة",
      "MyOrder" :  "طلباتي السابقة"
+  },
+
+
+ "myOrders": {
+    "title": "طلباتي",
+    "orderHistory": "سجل الطلبات",
+    "manageOrders": "إدارة وتتبع طلباتك",
+    "filters": {
+      "all": "جميع الطلبات",
+      "progress": "قيد التنفيذ",
+      "completed": "مكتمل",
+      "cancelled": "ملغي"
+    },
+    "order": "طلب",
+    "total": "الإجمالي",
+    "viewDetails": "عرض التفاصيل",
+    "noOrders": "لا توجد طلبات",
+    "orderDetails": "تفاصيل الطلب",
+    "orderID": "رقم الطلب",
+    "date": "التاريخ",
+    "status2": "الحالة",
+    "items": "العناصر",
+    "taxFees": "الضريبة",
+    "deliveryFees": "رسوم التوصيل",
+    "status": {
+      "processing": "قيد المعالجة",
+      "completed": "مكتمل",
+      "cancelled": "ملغي",
+      "new":"جديد"
+    }
+  },
+  "common": {
+    "currency": "ج.م"
   }
+
+
 }

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Fab } from "@mui/material";
 import { FaArrowUp } from "react-icons/fa";
@@ -6,7 +5,7 @@ import useScrollTrigger from "@mui/material/useScrollTrigger";
 import Box from "@mui/material/Box";
 import Fade from "@mui/material/Fade";
 
-const ScrollToTop = (props) => {
+const ScrollToTop = () => {
   const trigger = useScrollTrigger({
     disableHysteresis: true,
     threshold: 100,
@@ -17,43 +16,29 @@ const ScrollToTop = (props) => {
   };
 
   return (
-<Fade in={trigger}>
-  <Box
-    onClick={handleClick}
-    role="presentation"
-    sx={{
-      position: "fixed",
-      bottom: 16,
-      right: 16,
-      zIndex: 1000,
-    }}
-  >
-    <Fab
-      size="small"
-      aria-label="scroll back to top"
-      sx={{
-        position: "fixed",
-        bottom: 16,
-        right: 16,
-        zIndex: 1000,
-        backgroundColor: "#f44336",
-        transition: "0.3s",
-        "&:hover": {
-          backgroundColor: "#f44336",
-          color: "#f44336",
-          transform: "scale(1.1)",
-          // boxShadow: "0 0 10px rgba(0,0,0,0.2)",
-        },
-      }}
-    >
-      <FaArrowUp style={{
-        color:"#fff"
-        
-        }} />
-    </Fab>
-  </Box>
-</Fade>
-
+    <Fade in={trigger}>
+      <Box
+        onClick={handleClick}
+        role="presentation"
+        sx={{
+          position: "fixed",
+          bottom: 16,
+          right: 16,
+          zIndex: 1000,
+        }}
+      >
+        <Fab
+          size="medium"
+          sx={{
+            backgroundColor: "#f44336",
+            transition: "0.3s",
+            "&:hover": { transform: "scale(1.1)", backgroundColor: "#f44336" }
+          }}
+        >
+          <FaArrowUp style={{ color: "#fff" }} />
+        </Fab>
+      </Box>
+    </Fade>
   );
 };
 

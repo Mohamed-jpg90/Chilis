@@ -176,6 +176,38 @@
     "signUp": "Sign Up",
     "language": "Language",
     "MyOrder" : "My Order"
+  },
+
+  "myOrders": {
+    "title": "My Orders",
+    "orderHistory": "Order History",
+    "manageOrders": "Manage and track your orders",
+    "filters": {
+      "all": "All Orders",
+      "progress": "In Progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "order": "Order",
+    "total": "Total",
+    "viewDetails": "View Details",
+    "noOrders": "No orders found",
+    "orderDetails": "Order Details",
+    "orderID": "Order ID",
+    "date": "Date",
+    "status2": "Status",
+    "items": "Items",
+    "taxFees": "Tax Fees",
+    "deliveryFees": "Delivery Fees",
+    "status": {
+      "processing": "Processing",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "new":"New"
+    }
+  },
+  "common": {
+    "currency": "EGP"
   }
 
 
