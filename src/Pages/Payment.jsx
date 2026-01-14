@@ -27,76 +27,69 @@ function Payment() {
     //         resetpayment();
     //     };
     // }, []);
+useEffect(() => {
+  if (scriptLoaded.current) return;
+  scriptLoaded.current = true;
 
-    useEffect(() => {
-        if (!orderDetails || scriptLoaded.current) return; // mesh 3arfha 
-        scriptLoaded.current = true;
+  const script = document.createElement("script");
+  script.src =
+    "https://app.fawaterk.com/fawaterkPlugin/fawaterkPlugin.min.js";
+  script.async = true;
 
-        const script = document.createElement("script");/// mesh 3arfha 
-        script.src =
-            "https://app.fawaterk.com/fawaterkPlugin/fawaterkPlugin.min.js";
-        script.async = true;
+  script.onload = () => {
+    window.pluginConfig = {
+      envType: "test",
+      hashKey: "HASH_GENERATED_FROM_TOOL",
 
-        script.onload = () => {
+      style: { listing: "horizontal" },
 
+      requestBody: {
+        cartTotal: total.toFixed(2),
+        currency: "EGP",
 
-            const cartItems = cart.map((item) => ({
-                name: item.name,
-                price: item.price.toFixed(2),
-                quantity: item.quantity.toString(),
-                id: item.id.toString()
-            }));
+        customer: {
+          first_name: username || "Guest",
+          last_name: "User",
+          email: email || "test@test.com",
+          phone: phone || "01000000000",
+          address: "Cairo, Egypt",
+        },
 
-            setOrderDetails(cartItems)
+        redirectionUrls: {
+          successUrl:
+            "https://chilis-iota.vercel.app/payment/success",
+          failUrl:
+            "https://chilis-iota.vercel.app/payment/failed",
+          pendingUrl:
+            "https://chilis-iota.vercel.app/payment/pending",
+        },
 
-            window.pluginConfig = {
-                envType: "test",
-                hashKey: "4caf1b3e9068445b5a33ed40df4b9eabd87d1301707b782a02541fd5ce31b4d9",
+        cartItems: cart.map((item) => ({
+          name: item.name,
+          price: item.price.toFixed(2),
+          quantity: item.quantity.toString(),
+        })),
 
-                style: {
-                    listing: "horizontal",
-                },
-                requestBody: {
-                    cartTotal: total.toFixed(2) || 0,
-                    currency: "EGP",
-                    customer: {
-                        first_name: username,
-                        last_name: "Test",
-                        email: email,
-                        phone: phone,
-                        address: "Cairo, Egypt",
-                    },
-                    redirectionUrls: {
-                        successUrl:
-                            "https://chilis-iota.vercel.app/payment/success",
-                        failUrl:
-                            "https://chilis-iota.vercel.app/payment/fail",
-                        pendingUrl:
-                            "https://chilis-iota.vercel.app/payment/pending",// mesh fahim 
-                    },
-                    cartItems: {
-                        name: "Order Payment",
-                        price: total.toFixed(2),
-                        quantity: "1",
-                    },
-                    payLoad: {
-                        order_id: orderDetails.id,
-                    },
-                },
-            };
+        payLoad: {
+          order_id: "12345",
+        },
+      },
+    };
 
-            window.fawaterkCheckout(window.pluginConfig);
-        };
+    window.fawaterkCheckout(window.pluginConfig);
+  };
 
-        document.body.appendChild(script);
+  document.body.appendChild(script);
+}, []);
 
-
-    }, [orderDetails]);
 
     return (
         <div>
             <h2>Payment</h2>
             <h3>Total: {total.toFixed(2)} EGP</h3>
+
+            {/* REQUIRED */}
+            <div id="fawaterkDivId"></div>
         </div>
     );
 }
