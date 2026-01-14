@@ -11,16 +11,21 @@ const URL = "https://myres.me/chilis-dev/api";
 import { toast } from 'react-hot-toast';
 import { useCartAddresses } from '../store/CartStore';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { FaBlackTie } from 'react-icons/fa';
 import LogInAgain from './LogInAgain';
-import Order from './Order';
+import { useNavigate } from 'react-router-dom';
 
 function Cart() {
+  const navigate = useNavigate();
+
   const [loading, setLoading] = useState(false)
   const cart = useCartStore((state) => state.cart)
   const updateNote = useCartStore((state) => state.updateNote)
   const removeFromCart = useCartStore((state) => state.removeFromTheCart)
   const updateQuantity = useCartStore((state) => state.updateCart)
+  const setTotal = useCartStore((state) => state.setTotal);
+  const startPayment = useCartStore((state) => state.startPayment)
+  const canPay = useCartStore ((state)=> state.canPay)
+
   const [token, setToken] = useState(localStorage.getItem('token'));
   const addnewadd = useCartAddresses((state) => state.addAddress)
   const addresscontainer = useCartAddresses((state) => state.address)
@@ -33,6 +38,8 @@ function Cart() {
   const [areaContainer, setAreaContainer] = useState([])
 
   const [cityNameId, setCityNameId] = useState([])
+
+  const [credit, setCredit] = useState(false)
 
   const [city, setCity] = useState('')
   const [area, setArea] = useState('')
@@ -128,12 +135,17 @@ function Cart() {
     return sum + (itemPrice + extrasTotal) * item.quantity;
   }, 0);
 
-  const deliveryFee = pickup ? 0 : 50;
-  const taxRate = tax3 / 100;
-  const tax2 = subtotal * taxRate;
-  const totalDidscount = (subtotal + deliveryFee + tax2)* (discount/100)
-  const total = (subtotal + deliveryFee + tax2) - totalDidscount || 0 ;
+const deliveryFee = pickup
+  ? 0
+  : typeof addresscontainer?.deliveryFee === "number"
+    ? addresscontainer.deliveryFee
+    : 0;
+    
+    const taxRate = tax3 / 100;
 
+  const tax2 = subtotal * taxRate;
+  const totalDidscount = (subtotal + deliveryFee + tax2) * (discount / 100)
+  const total = subtotal + deliveryFee + tax2 - totalDidscount;
   //////////////////////////////////////////////////////
   const fetchAddresses = async () => {
     if (!token) {
@@ -143,6 +155,8 @@ function Cart() {
     else {
       try {
         const res = await axios.get(`${URL}/profile/address?api_token=${token}`);
+        // console.log(res.data.data.address);
+
         if (res.data.response == false) {
           if (res.data.message === "Invalid Token") {
             localStorage.removeItem("token")
@@ -151,10 +165,13 @@ function Cart() {
           else toast.error(t('Cart.somethingWrong'))
         }
         else {
+
           const addresses = res.data.data.address.map(addr => ({
             name: addr.address_name,
             address: addr.address1,
-            id: addr.id
+            id: addr.id,
+            deliveryFee: addr?.area?.area_branches?.delivery_fees ?? 70
+             
           }));
           setAddressMessage(addresses);
         }
@@ -175,7 +192,8 @@ function Cart() {
     const theSelectedAddress = {
       id: item.id,
       address: item.address,
-      name: item.name
+      name: item.name,
+      deliveryFee: item.deliveryFee || 60
     }
     addnewadd(theSelectedAddress)
     setSelectAddressStyle(item.id)
@@ -200,6 +218,7 @@ function Cart() {
       console.log("the error is :", e);
     }
   };
+  //////////////////////////////////////////////////////////////
 
   const handeleAddAddress = async () => {
     setPopUp(false)
@@ -216,6 +235,7 @@ function Cart() {
       console.log("the error :", e)
     }
   }
+  //////////////////////////////////////////////////////////////
 
   const addNewAddress = async (e) => {
     e.preventDefault()
@@ -258,6 +278,7 @@ function Cart() {
       }
     }
   };
+  //////////////////////////////////////////////////////////////
 
   const handelpickup = async () => {
     const res = await axios.get(`${URL}/branches/1`)
@@ -268,6 +289,7 @@ function Cart() {
     }))
     setBranchs(allBranches)
   }
+  //////////////////////////////////////////////////////////////
 
   useEffect(() => {
     handelpickup()
@@ -278,13 +300,36 @@ function Cart() {
 
   const handelOrder = async () => {
 
-    if (pickup && !SelectedBranch) {
+    if (credit) {
+      // جهز البيانات اللي هنبعتها لصفحة الدفع
+      const pendingOrder = {
+        pickup,
+        SelectedBranch,
+        addresscontainer,
+        cart,
+        total,
+        deliveryFee,
+        tax2,
+        discount
+      };
+
+      startPayment();
+      navigate("/payment");
+      return;
+    }
+
+    //----------------------------------------------------------//
+    // chash on delevery 
+    //----------------------------------------------------------//
+    else if (pickup && !SelectedBranch) {
       toast.error("you must Select Branch");
       return;
     } else {
 
-
       const deliveryType = pickup ? 2 : 1;
+      const paymentType = credit ? 2 : 1;
+
+
       const itemsData = {
         items: cart.map((item) => ({
 
@@ -297,7 +342,7 @@ function Cart() {
         }))
       };
       const itemsString = JSON.stringify(itemsData);
-      const orderUrl = `${URL}/orders/create?delivery_type=${deliveryType}&payment=1&lat=0&lng=0&address=${addresscontainer?.id}&area=10&branch=${SelectedBranch || 2}&items=${itemsString}&device_id=&notes=&time=&car_model=&car_color=&gift_cards=&coins=0.00&api_token=${token}`;
+      const orderUrl = `${URL}/orders/create?delivery_type=${deliveryType}&payment=${paymentType}&lat=0&lng=0&address=${addresscontainer?.id}&area=10&branch=${SelectedBranch || 2}&items=${itemsString}&device_id=&notes=&time=&car_model=&car_color=&gift_cards=&coins=0.00&api_token=${token}`;
 
       try {
         setLoading(true);
@@ -307,13 +352,13 @@ function Cart() {
             localStorage.removeItem("token");
             setErrMessage(true);
           } else {
-            toast.error(t('Cart.somethingWrong'));
+            toast.error(t('Cart.SomethingWrong'));
           }
         } else {
-          toast.success(t('Cart.orderCreated'));
+          toast.success(t('Cart.OrderCreated'));
           setOrderID(res.data.data.order_id);
           console.log(res?.data?.data)
-          cleare(); // امسح السلة بعد النجاح
+          cleare();
         }
 
 
@@ -329,14 +374,25 @@ function Cart() {
 
 
   }
+  /////////////////////////////////////
+  useEffect(() => {
+    setTotal(total);
+  }, [total]); // to store the total and use it in the payment page 
+
+
+   useEffect(() => {
+   console.log("canPay:", canPay);
+   }, [canPay]);
 
 
   /////////////////////////////////////////////////
   return (
     <div className='cart_container' dir={currentLanguage === 'ar' ? 'rtl' : 'ltr'}>
+      {/* /////////////nav bar /////////////////////// */}
       <div className="navprofilebar">
         <NaveBare token={token} />
       </div>
+      {/* ////////////////////////////////////// */}
       <div className="content_of_cart">
         {!pickup && (
           <div className='address_of_user'>
@@ -463,7 +519,7 @@ function Cart() {
 
                           {item.option && (
                             <div>
-                              <p>{t('Cart.option')}</p>
+
                               <p>{getDisplayName(item.option)}</p>
                             </div>
                           )}
@@ -497,17 +553,24 @@ function Cart() {
           <hr />
           {/* ////////////////////////////////////////////////////////////////////////////////////////////////// */}
 
-          <div className='coupon_section'>
+          <div className='coupon_section' style={{
+            width: "100%",
+
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}>
             <input
               type="text"
-              placeholder='Enter Your Coupon'
-              style={{ marginTop: "5px", width: "80%", border: "1px solid black" }}
+              placeholder={t('Apply.placeHolder')}
+              style={{ marginTop: "5px", width: "70%", border: "1px solid black" }}
               value={coupon}
+              className='input'
               onChange={(e) => {
                 setCoupon(e.target.value)
                 setCancel(false)
               }
-              }   // مهم جداً
+              }
             />
 
             {/* APPLY button: يظهر لو طول الكوبون أقل من 1 */}
@@ -520,7 +583,7 @@ function Cart() {
                 className='the_button2'
                 sx={{
                   width: "20%",
-                  marginTop: "-2px",
+                  marginTop: "3px",
                   backgroundColor: "#f44336",
                   border: "3px solid #f44336",
                   color: "white",
@@ -531,7 +594,7 @@ function Cart() {
                   transition: "0.5s",
                 }}
               >
-                {t('Apply')}
+                {t('Apply.Apply')}
               </Button>
             )}
 
@@ -614,7 +677,7 @@ function Cart() {
                   <p>{t('Cart.tax')} {Math.floor(tax3)}%</p>
                   <p>{tax2.toFixed(2)} {t('Cart.egp')}</p>
                 </div>
-{/*        
+                {/*        
                           <div>
                   <p>{t('Cart.coupon')} </p>
                   <p>{Math.floor(discount)}%</p>
@@ -635,7 +698,9 @@ function Cart() {
                       type="radio"
                       name="PaymentMethod"
                       value="delivery"
-                      checked
+                      checked={!credit}
+                      onChange={() => setCredit(false)}
+
                     />
                     {t('Cart.cashOnDelivery')}
                   </label>
@@ -646,6 +711,9 @@ function Cart() {
                       type="radio"
                       name="PaymentMethod"
                       value="pickup"
+                      checked={credit}
+                      onChange={() => setCredit(true)}
+
                     />
                     {t('Cart.creditCard')}
                   </label>
@@ -680,6 +748,8 @@ function Cart() {
               </Button>
             </div>
           </div>
+
+
         </div>
       </div>
 

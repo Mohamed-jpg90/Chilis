@@ -45,7 +45,7 @@ useEffect(()=>{
           </p>
           <br />
           <br />
-          <Link to={'/'} className={token ? "sec1_but" : 'dis_non'}>
+          <Link to={'https://wa.me/+201013933726'} className={"sec1_but" }>
             {t('home.contactUs')}
           </Link>
         </div>
@@ -78,3 +78,5 @@ useEffect(()=>{
 }
 
 export default Home2;
+
+

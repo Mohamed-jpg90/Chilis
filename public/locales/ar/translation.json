@@ -104,8 +104,9 @@
     "addAddress": "إضافة العنوان",
     "completeRequirements": "يجب إكمال جميع المتطلبات.",
     "addSuccess": "تم إضافة العنوان بنجاح",
-    "somethingWrong": "حدث خطأ ما",
-    "orderCreated" : " تم الطلب بنجاح "
+    "SomethingWrong": "حدث خطأ ما",
+    "OrderCreated":"تم طلب المنتج"
+
   },
     "ChangePassword": {
     "title": "تغيير كلمة المرور",
@@ -210,6 +211,10 @@
   },
   "common": {
     "currency": "ج.م"
+  },
+    "Apply":{
+    "Apply" : "تنفيذ",
+    "placeHolder": "ادخل الكوبون الخاص بك"
   }
 
 

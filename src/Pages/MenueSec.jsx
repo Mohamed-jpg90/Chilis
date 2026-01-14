@@ -12,7 +12,7 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 import { FaChevronCircleRight } from "react-icons/fa";
 import { FaChevronCircleLeft } from "react-icons/fa";
-import { useTranslation } from 'react-i18next'; // Fixed import
+import { useTranslation } from 'react-i18next';
 
 const URL = "https://myres.me/chilis-dev/api";
 
@@ -33,7 +33,7 @@ function MenueSec() {
     const [selectedOption, setSelectedOption] = useState(null);
     const [selectedExtras, setSelectedExtras] = useState([]);
 
-    const { t, i18n } = useTranslation(); // Fixed hook name and added i18n
+    const { t, i18n } = useTranslation(); //  added i18n
     const currentLanguage = i18n.language;
 
 
@@ -141,7 +141,6 @@ function MenueSec() {
     const handelAddToCart = (item) => {
         const product = {
             id: Math.random(),
-            // name: currentLanguage === 'ar' ? item.namear : item.name,
             infoID: item.infoID,
             name: item.name,
             namear: item.namear,

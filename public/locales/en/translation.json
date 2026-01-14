@@ -106,7 +106,8 @@
     "addAddress": "Add Address",
     "completeRequirements": "You should complete all requirements.",
     "addSuccess": "Address added successfully",
-    "somethingWrong": "Something went wrong"
+    "SomethingWrong": "Something went wrong",
+    "OrderCreated":"Order created successfully"
   },
     "ChangePassword": {
     "title": "Change password",
@@ -208,7 +209,12 @@
   },
   "common": {
     "currency": "EGP"
+  },
+  "Apply":{
+    "Apply" : "Apply",
+    "placeHolder": "Enter your coupon"
   }
+
 
 
 }
