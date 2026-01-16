@@ -17,16 +17,12 @@ function Payment() {
 
     const [token, setToken] = useState(localStorage.getItem('token'));
 
-    const scriptLoaded = useRef(false);
+    const scriptLoaded = useRef(false);// to privent load the useEffect twice 
 
     const [orderDetails, setOrderDetails] = useState(null);
 
 
-    // useEffect(() => {
-    //     return () => {
-    //         resetpayment();
-    //     };
-    // }, []);
+ 
 useEffect(() => {
   if (scriptLoaded.current) return;
   scriptLoaded.current = true;
@@ -37,46 +33,39 @@ useEffect(() => {
   script.async = true;
 
   script.onload = () => {
-    window.pluginConfig = {
-      envType: "test",
-      hashKey: "HASH_GENERATED_FROM_TOOL",
+window.pluginConfig = {
+  envType: "test",
+  hashKey: "93b88ceda80f8cb0ec34e0b35671ee2037851233e2c6978646b6c676a5960724",
 
-      style: { listing: "horizontal" },
+  style: { listing: "horizontal" },
 
-      requestBody: {
-        cartTotal: total.toFixed(2),
-        currency: "EGP",
+  requestBody: {
+    cartTotal: total.toFixed(2),
+    currency: "EGP",
 
-        customer: {
-          first_name: username || "Guest",
-          last_name: "User",
-          email: email || "test@test.com",
-          phone: phone || "01000000000",
-          address: "Cairo, Egypt",
-        },
+    customer: {
+      first_name: username || "Guest",
+      last_name: "User",
+      email: email || "test@test.com",
+      phone: phone || "01000000000",
+      address: "Cairo, Egypt",
+    },
 
-        redirectionUrls: {
-          successUrl:
-            "https://chilis-iota.vercel.app/payment/success",
-          failUrl:
-            "https://chilis-iota.vercel.app/payment/failed",
-          pendingUrl:
-            "https://chilis-iota.vercel.app/payment/pending",
-        },
+    redirectionUrls: {
+      successUrl: "https://chilis-iota.vercel.app/payment/success",
+      failUrl: "https://chilis-iota.vercel.app/payment/failed",
+      pendingUrl: "https://chilis-iota.vercel.app/payment/pending",
+    },
 
-        cartItems: cart.map((item) => ({
-          name: item.name,
-          price: item.price.toFixed(2),
-          quantity: item.quantity.toString(),
-        })),
+    cartItems: cart.map(item => ({
+      name: item.name,
+      price: item.price.toFixed(2),
+      quantity: item.quantity.toString(),
+    })),
+  },
+};
 
-        payLoad: {
-          order_id: "12345",
-        },
-      },
-    };
-
-    window.fawaterkCheckout(window.pluginConfig);
+window.fawaterkCheckout(window.pluginConfig);
   };
 
   document.body.appendChild(script);
@@ -95,3 +84,18 @@ useEffect(() => {
 }
 
 export default Payment;
+
+
+// import React from 'react'
+
+// function Payment() {
+//   return (
+//     <div>
+      
+//     </div>
+//   )
+
+// }
+
+
+// export default Payment
