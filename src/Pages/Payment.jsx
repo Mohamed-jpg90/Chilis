@@ -11,91 +11,79 @@ const pendingOrder = localStorage.getItem('pendingOrder')
 
 function Payment() {
 
-    const cart = useCartStore((state) => state.cart)
-    const total = useCartStore((state) => state.total);
-    const resetpayment = useCartStore((state) => state.resetpayment);
 
-    const [token, setToken] = useState(localStorage.getItem('token'));
+  const cart = useCartStore((state) => state.cart);
+  const total = useCartStore((state) => state.total);
+  const resetpayment = useCartStore((state) => state.resetpayment);
 
-    const scriptLoaded = useRef(false);// to privent load the useEffect twice 
-
-    const [orderDetails, setOrderDetails] = useState(null);
+  const scriptLoaded = useRef(false);
 
 
- 
-useEffect(() => {
-  if (scriptLoaded.current) return;
-  scriptLoaded.current = true;
+  useEffect(() => {
+    if (scriptLoaded.current) return;
+    scriptLoaded.current = true;
 
-  const script = document.createElement("script");
-  script.src =
-    "https://app.fawaterk.com/fawaterkPlugin/fawaterkPlugin.min.js";
-  script.async = true;
+    const script = document.createElement("script");
+    script.src =
+      "https://app.fawaterk.com/fawaterkPlugin/fawaterkPlugin.min.js";
+    script.async = true;
 
-  script.onload = () => {
-window.pluginConfig = {
-  envType: "test",
-  hashKey: "93b88ceda80f8cb0ec34e0b35671ee2037851233e2c6978646b6c676a5960724",
+    script.onload = () => {
+      var pluginConfig = {
+        envType: "test",
+        hashKey: "e039d57e089ea028360defdaffd54eb79cc47830d0a5ce41a2ca26b06c7cbde1",
+        style: { listing: "horizontal" },
+        version: "0",
+        requestBody: {
+          cartTotal: total.toFixed(2),
+          currency: "EGP",
 
-  style: { listing: "horizontal" },
+          customer: {
+            first_name: username || "Guest",
+            last_name: "User",
+            email: email || "test@test.com",
+            phone: phone || "01000000000",
+            address: "Cairo, Egypt",
+          },
 
-  requestBody: {
-    cartTotal: total.toFixed(2),
-    currency: "EGP",
+          redirectionUrls: {
+            successUrl: "https://chilis-iota.vercel.app/payment/success",
+            failUrl: "https://chilis-iota.vercel.app/payment/failed",
+            pendingUrl: "https://chilis-iota.vercel.app/payment/pending",
+          },
 
-    customer: {
-      first_name: username || "Guest",
-      last_name: "User",
-      email: email || "test@test.com",
-      phone: phone || "01000000000",
-      address: "Cairo, Egypt",
-    },
+          "cartItems": [{
+            "name": "this is test oop 112252",
+            "price": total.toFixed(2),
+            "quantity": "1"
+          },
 
-    redirectionUrls: {
-      successUrl: "https://chilis-iota.vercel.app/payment/success",
-      failUrl: "https://chilis-iota.vercel.app/payment/failed",
-      pendingUrl: "https://chilis-iota.vercel.app/payment/pending",
-    },
+          ],
+          "payLoad": {
+            "custom_field1": "xyz",
+            "custom_field2": "xyz2"
+          }
+        },
+      };
+      window.fawaterkCheckout(pluginConfig);
+    };
 
-    cartItems: cart.map(item => ({
-      name: item.name,
-      price: item.price.toFixed(2),
-      quantity: item.quantity.toString(),
-    })),
-  },
-};
-
-window.fawaterkCheckout(window.pluginConfig);
-  };
-
-  document.body.appendChild(script);
-}, []);
+    document.body.appendChild(script);
+  }, []);
 
 
-    return (
-        <div>
-            <h2>Payment</h2>
-            <h3>Total: {total.toFixed(2)} EGP</h3>
 
-            {/* REQUIRED */}
-            <div id="fawaterkDivId"></div>
-        </div>
-    );
+  return (
+    <div>
+      <h2>Payment</h2>
+      <h3>Total: {total.toFixed(2)} EGP</h3>
+
+      {/* REQUIRED */}
+      <div id="fawaterkDivId"></div>
+    </div>
+  );
 }
 
 export default Payment;
 
 
-// import React from 'react'
-
-// function Payment() {
-//   return (
-//     <div>
-      
-//     </div>
-//   )
-
-// }
-
-
-// export default Payment
