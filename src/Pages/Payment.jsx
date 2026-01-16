@@ -76,7 +76,7 @@ function Payment() {
   return (
     <div>
       <h2>Payment</h2>
-      <h3>Total: {total.toFixed(2)} EGP</h3>
+      <h3>Total:: {total.toFixed(2)} EGP</h3>
 
       {/* REQUIRED */}
       <div id="fawaterkDivId"></div>
