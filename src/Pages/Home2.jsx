@@ -13,6 +13,7 @@ import ScrollToTop from './ScrollToTop';
 import Cookies from 'js-cookie'
 import { MdAddToDrive } from 'react-icons/md';
 import AddToCartSuccess from './AddToCartSuccess';
+import { HashLink } from 'react-router-hash-link';
 function Home2() {
   const location = useLocation();
   const [token, setToken] = useState(localStorage.getItem('token'))
@@ -45,9 +46,9 @@ useEffect(()=>{
           </p>
           <br />
           <br />
-          <Link to={'https://wa.me/+201013933726'} className={"sec1_but" }>
+          <HashLink to={'/#contact_us'} className={"sec1_but" }>
             {t('home.contactUs')}
-          </Link>
+          </HashLink>
         </div>
       </div>
 

@@ -12,6 +12,8 @@ import { toast } from 'react-hot-toast';
 import { useCartAddresses } from '../store/CartStore';
 import LoadingButton from '@mui/lab/LoadingButton';
 import LogInAgain from './LogInAgain';
+import Swal from 'sweetalert2';
+
 import { useNavigate } from 'react-router-dom';
 
 function Cart() {
@@ -27,6 +29,7 @@ function Cart() {
   const canPay = useCartStore ((state)=> state.canPay)
 
   const [token, setToken] = useState(localStorage.getItem('token'));
+  const [loginPlease, setLoginPlease] = useState(token)
   const addnewadd = useCartAddresses((state) => state.addAddress)
   const addresscontainer = useCartAddresses((state) => state.address)
   const clearAddress = useCartAddresses((state) => state.cleerAddress)
@@ -119,6 +122,35 @@ function Cart() {
 
     }
   }
+
+   const handeleDelet = async (id) => {
+      const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          confirmButton: "butttton",
+          cancelButton: "butttton2"
+        },
+        buttonsStyling: false
+      });
+  
+      swalWithBootstrapButtons.fire({
+        title: t('Profile.deleteConfirmTitle'),
+        text: t('Profile.deleteConfirmText'),
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: t('Profile.deleteConfirm'),
+        cancelButtonText: t('Profile.deleteCancel'),
+        reverseButtons: true
+      }).then((result)=>
+      {
+        if(result.isConfirmed){
+          useCartStore.getState().removeFromTheCart(id )
+        }
+        else{
+          console.log("halllow ")
+        }
+      });
+    };
+  
 
   const { t, i18n } = useTranslation();
   const currentLanguage = i18n.language;
@@ -457,7 +489,7 @@ const deliveryFee = pickup
         <div className="items_products">
           <div className='cart_menu' >
             <img src={imag8} alt='logo' style={{ maxWidth: "50px", marginRight: "10px" }} />
-            <span> chili's </span>
+            <span> {t("chili's")}</span>
           </div>
           <hr />
 
@@ -484,7 +516,7 @@ const deliveryFee = pickup
                                   updateQuantity(item.id, item.quantity - 1);
                                 }
                                 else {
-                                  removeFromCart(item.id)
+                                  handeleDelet(item.id)
                                 }
                               }}
                               style={{ width: "30px", height: "30px", lineHeight: "1" }}
@@ -503,7 +535,8 @@ const deliveryFee = pickup
                               className="close-btn"
                               aria-label="Close popup"
                               onClick={() => {
-                                useCartStore.getState().removeFromTheCart(item.id)
+                           
+                                handeleDelet(item.id)
                               }}
                             >
                               &times;
@@ -916,9 +949,52 @@ const deliveryFee = pickup
         </div>
       )}
 
+
+     {!loginPlease && (
+
+ 
+           <div className="overlay" onClick={() => setLoginPlease(true)}>
+          <div className="myModal" role="document" onClick={(e) => e.stopPropagation()} >
+            <div className="modal_header">
+              <h2> {t('Cart.Login')} </h2>
+              <button
+                className="close-btn"
+                aria-label="Close popup"
+                onClick={() => setLoginPlease(true)}
+              >
+                &times;
+              </button>
+            </div>
+            <div className="modal_body">
+              <div>
+              
+                  <p className="no-address">{t('Cart.LoginPlease')}</p>
+            
+                
+              </div>
+            </div>
+            <div className="modal-actions">
+              <button className="btn-secondary"   onClick={() => setLoginPlease(true)}>
+                {t('Cart.cancel')}
+              </button>
+              <button onClick={() => {navigate('/Login')}} >
+                {t('Login.title')}
+              </button>
+            </div>
+          </div>
+        </div>
+      
+
+     )}
+
+{/* //////////////////////////////////////////////////////// */}
       {errMessage && (
         <LogInAgain />
       )}
+ 
+
+
+
     </div>
   )
 }

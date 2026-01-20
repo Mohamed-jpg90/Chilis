@@ -1,4 +1,9 @@
 {
+  "arapic":"Arabic",
+      "english":"English",
+    "chili's" : "chili's",
+
+
   "home": {
     "welcome": "Welcome to Our Restaurant",
     "experience": "Experience the finest dining with a variety of cuisines.",
@@ -107,7 +112,9 @@
     "completeRequirements": "You should complete all requirements.",
     "addSuccess": "Address added successfully",
     "SomethingWrong": "Something went wrong",
-    "OrderCreated":"Order created successfully"
+    "OrderCreated":"Order created successfully",
+    "Login" : "you don't have email yet",
+    "LoginPlease" : " Login Please"
   },
     "ChangePassword": {
     "title": "Change password",

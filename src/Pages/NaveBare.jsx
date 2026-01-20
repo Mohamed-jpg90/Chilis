@@ -91,28 +91,22 @@ function NaveBare({ token }) {
 
   /// to disable scroll in mobile view 
 useEffect(() => {
-  if (isOpen) {
- 
-    // نثبّت الجسم في مكانه
+  const isHomePage = location.pathname === '/';
+
+  if (isOpen && isHomePage) {
     document.body.style.position = 'fixed';
     document.body.style.overflow = 'hidden';
-
   } else {
-
     document.body.style.position = '';
     document.body.style.overflow = '';
-
   }
 
-  // لو اتقفل الكومبوننت لأي سبب
   return () => {
     document.body.style.position = '';
-    document.body.style.top = '';
-    document.body.style.left = '';
-    document.body.style.right = '';
     document.body.style.overflow = '';
   };
-}, [isOpen]);
+}, [isOpen, location.pathname]);
+
 
 
 
@@ -401,7 +395,7 @@ useEffect(() => {
 
               {token && (
                 <>
-                  {window.location.pathname !== '/Profile' && (
+                 
                     <li className="nav-item">
                       <Link
                         to="/Profile"
@@ -411,8 +405,8 @@ useEffect(() => {
                         {t('navbar.yourProfile')}
                       </Link>
                     </li>
-                  )}
-                      {window.location.pathname !== '/myOrder' && (
+                
+                     
                         <li>
                           <Link
                             to="/myOrder"
@@ -425,7 +419,7 @@ useEffect(() => {
                             {t('navbar.MyOrder') || "MY Order"}
                           </Link>
                         </li>
-                      )}
+                  
 
                   <li className="nav-item">
                     <Link
@@ -433,7 +427,7 @@ useEffect(() => {
                         handeleLogOut();
                         setIsOpen(false);
                       }}
-                      className={`nav-link ${window.location.pathname !== '/' ? "navbarLinksProfile" : "custom-link"}`}
+                      className={`nav-link navbarLinksProfile`}
                       style={{color:"#f44336"}}
                     >
                       {t('navbar.logOut')}
@@ -444,7 +438,7 @@ useEffect(() => {
 
 
               {/* Cart Icon */}
-              { window.location.pathname !== '/Cart' && (
+           
                 <li className="nav-item">
                   <div className="cartIcon">
                     <HashLink
@@ -459,7 +453,7 @@ useEffect(() => {
                     )}
                   </div>
                 </li>
-              )}
+       
 
 
 
@@ -467,29 +461,29 @@ useEffect(() => {
               {/* Auth Links */}
               {!token && (
                 <>
-                  {window.location.pathname !== '/Login' && (
+                  
                     <li className="nav-item">
                       <Link
                         to="/Login"
-                        className={`nav-link ${window.location.pathname === "/" ? "sec" : "secProfile"}`}
+                        className={`nav-link sec`}
                         onClick={() => setIsOpen(false)}
                       >
                         {t('navbar.logIn')}
                       </Link>
                     </li>
-                  )}
+               
 
-                  {window.location.pathname !== '/Regester' && (
+             
                     <li className="nav-item">
                       <Link
                         to="/Regester"
-                        className={`nav-link ${window.location.pathname === "/" ? "sec" : "secProfile"}`}
+                        className={`nav-link sec`}
                         onClick={() => setIsOpen(false)}
                       >
                         {t('navbar.signUp')}
                       </Link>
                     </li>
-                  )}
+                
                 </>
               )}
 
@@ -522,10 +516,11 @@ useEffect(() => {
                       transition: "0.3s"
                     }}
                   >
-                    English
+                  {t('english')}
+
                   </span>
 
-                  <span style={{ color: window.location.pathname === '/' ? 'white' : 'black' }}>|</span>
+                  <span style={{ color:  'white'  }}>|</span>
 
                   <span
                     onClick={() => changeLanguage('ar')}
@@ -535,7 +530,7 @@ useEffect(() => {
                       transition: "0.3s"
                     }}
                   >
-                    العربية
+                    {t('arapic')}
                   </span>
                 </div>
               </li>

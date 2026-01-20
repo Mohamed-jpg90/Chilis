@@ -2011,3 +2011,10 @@ input:focus {
 }
 
 /* ////////////coupon input ////////////// */
+
+.btn-secondary:hover {
+  background-color: gray;
+  color: inherit;
+  border-color: inherit;
+  box-shadow: none;
+}

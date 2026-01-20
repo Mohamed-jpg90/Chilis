@@ -8,7 +8,7 @@ function Footer() {
   const { t, i18n } = useTranslation() 
 
   return (
-    <div className="footer_container">
+    <div className="footer_container" id= 'contact_us'>
       <div className="ffoo">
         <div className="image3">
           <img className='lazzy' src={img3} alt="logo" />

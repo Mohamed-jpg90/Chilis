@@ -1,4 +1,8 @@
 {
+    "arapic":"العربي",
+    "english":"الانجليزيه",
+    "chili's" : "تشيليز",
+
   "home": {
     "welcome": "مرحباً بكم في مطعمنا",
     "experience": "جربوا أفضل المأكولات مع مجموعة متنوعة من المطابخ.",
@@ -105,7 +109,11 @@
     "completeRequirements": "يجب إكمال جميع المتطلبات.",
     "addSuccess": "تم إضافة العنوان بنجاح",
     "SomethingWrong": "حدث خطأ ما",
-    "OrderCreated":"تم طلب المنتج"
+    "OrderCreated":"تم طلب المنتج",
+    "Login" : "انت لم تسجل الدخول بعد",
+    "LoginPlease" : "برجاء تسجيل الدخول"
+
+
 
   },
     "ChangePassword": {
