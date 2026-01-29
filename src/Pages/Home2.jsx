@@ -19,7 +19,7 @@ function Home2() {
   const [token, setToken] = useState(localStorage.getItem('token'))
   const [menuData, setMenuData] = useState([]);
   const { t , i18n} = useTranslation(); // Initialize translation function
-
+const [showMore, setShowMore] = useState(false);
 const lng = Cookies.get("i18next") || "en"
 
 useEffect(()=>{
@@ -53,21 +53,48 @@ useEffect(()=>{
       </div>
 
       {/* Section 2 - About Us */}
-      <div className="section2" id='aboutUs'>
-        <div className="container_section2">
-          <div className="AboutUsContent">
-            <h2>{t('aboutUs.title')}</h2>
-            <hr></hr>
-            <p>
-              {t('aboutUs.description')}
-            </p>
-          </div>
+{/* Section 2 - About Us */}
+<div className="section2" id="aboutUs">
+  <div className="container_section2">
+    <div className="AboutUsContent">
+      <h2 style={{maxWidth:"100"}}>
+        
+        <span style={{ color: "#f44336" }}> {t('aboutUs.title1')} </span>
+        {t('aboutUs.title')}
+        
+        </h2>
 
-          <div className="AboutUsImage">
-            <img src={img3} alt={t('aboutUs.imageAlt')} />
-          </div>
-        </div>
-      </div>
+        <h5 style={{color: "gray"}}>
+          {t('aboutUs.ourStory')}
+        </h5>
+      <hr />
+
+      <p>
+        {showMore
+          ? t('aboutUs.description')
+          : t('aboutUs.description').slice(0, 400) + '...'}
+      </p>
+
+      {t('aboutUs.description').length > 400 && (
+        <span
+          onClick={() => setShowMore(prev => !prev)}
+          style={{
+            cursor: 'pointer',
+            color: '#f44336',
+            fontWeight: '500'
+          }}
+        >
+          {showMore ? t('common.showLess') : t('common.showMore')}
+        </span>
+      )}
+    </div>
+
+    <div className="AboutUsImage">
+      <img src={img3} alt={t('aboutUs.imageAlt')} />
+    </div>
+  </div>
+</div>
+
 
       {/* Section 3 - Menu */}
       <div id="menu-section">

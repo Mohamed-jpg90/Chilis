@@ -236,6 +236,7 @@ label {
 /* ///////////////////////////////////////////// */
 /* footer  */
 .ffoo {
+  color: #f44336;
   text-align: center;
   padding: 10px 20px;
   display: flex;
@@ -259,8 +260,10 @@ label {
 
 .foo_text {
   margin-top: 20px;
-  max-width: 50%;
+  max-width: 25%;
   color: var(--body_color);
+  text-align: left;
+
 }
 
 /* ///////////////////////////////////////////////// */
@@ -386,6 +389,7 @@ label {
 @media (max-width: 780px) {
   .AboutUsContent {
     width: 100%;
+    text-align: center;
     color: var(--body_color);
     padding: 1px 1px;
     border-radius: 15px;
@@ -413,7 +417,13 @@ label {
 
 
   .AboutUsImage {
-    display: none;
+    /* display: none; */
+    width: 100%;
+    height: 350px;
+    transition: 0.5s;
+  }
+  .AboutUsImage:hover{
+    transform: translatey(-20px);
   }
 }
 
@@ -647,7 +657,7 @@ input:focus {
   position: relative;
   width: 90%;
   margin: auto;
-  margin-top: 100px;
+  margin-top: 50px;
   height: 50vh;
   display: flex;
   justify-content: center;

@@ -11,11 +11,13 @@
     "contactUs": "Contact Us"
   },
   "aboutUs": {
-    "title": "About Us",
-    "imageAlt": "About Us",
-    "description": "Welcome to chilis, where flavor meets tradition. Founded with a passion for authentic cuisine and exceptional dining experiences, we take pride in crafting dishes that delight every sense. Our menu combines the freshest ingredients with time-honored recipes, offering something for everyone—from classic favorites to innovative creations. At chilis, we believe that great food brings people together, and every meal is an opportunity to create lasting memories. Whether you're joining us for a casual lunch, a family dinner, or a special celebration, our warm and welcoming atmosphere ensures a dining experience you'll never forget. Come taste the difference, and let us make every meal extraordinary."
+    "title":  " — Getting Real Transparent  " ,
+    "title1": "Chili’s Egypt",
+    "ourStory": "Our Story",
+   
+    "description": "We are Chili’s. We are THE undisputed Champions of Living Deliciously. We invented casual dining 50 years ago in Dallas, Texas. Since then, we have become a cultural phenomenon with over 1,500 restaurants around the world. We believe in making the most of every day, with great vibes, great company, great drinks, and great food infused with our Texas roots and Southwest American style. So, order the crispers, dip it in our house-made ranch, grab an Oldtimer with cheese, and if you crave attention, we recommend our sizzling fajitas and a hand-shaken margarita. Our flavorful list is long, and life is short. Go on and Live Delici"
   },
-
+ 
     "menu": {
     "title": "Menu",
     "loadingMenu": "Loading menu...",
@@ -70,6 +72,7 @@
     "selectLocation": "Select Location"
   },
  "Cart": {
+  "mustSelectAddress": " You Must Select Address",
     "addresses": "Addresses",
     "mustLogin": "You must log in to add an address",
     "noAddresses": "No addresses yet",
@@ -215,7 +218,9 @@
     }
   },
   "common": {
-    "currency": "EGP"
+    "currency": "EGP",
+     "showMore": " Show More",
+    "showLess": "Show Less "
   },
   "Apply":{
     "Apply" : "Apply",

@@ -62,7 +62,7 @@ export const useCartAddresses = create (
         (set)=>({
     address : null ,
     addAddress : (address) => set ( () =>({ address: address }) ),
-    cleerAddress : ()=> set({address : {} }) 
+    cleerAddress: () => set({ address: null })
 }),{
     name: "the_celecter_address"
 }

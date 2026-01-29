@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { useCartStore } from '../store/CartStore';
 import DarkMoode from './DarkMoode';
 import './NaveBare.css';
+import { useCartAddresses } from '../store/CartStore';
 function NaveBare({ token }) {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
@@ -55,6 +56,9 @@ function NaveBare({ token }) {
   const handeleLogOut = () => {
     localStorage.removeItem('token');
     window.location.reload();
+    useCartAddresses.getState().cleerAddress();
+    // navigate("/login");
+
   };
 
   useEffect(() => {
@@ -174,7 +178,7 @@ useEffect(() => {
 
 
             {/* Language Switcher - Now as regular list item */}
-            <li className="nav-item" ref={languageDropdownRef}>
+            {/* <li className="nav-item" ref={languageDropdownRef}>
               <span
                 className={`dropdown-icon ${window.location.pathname !== '/' ? "dropdown__2" : "dropdown__"}`}
                 onClick={() => setIsLanguageDropDown(prev => !prev)}
@@ -237,7 +241,37 @@ useEffect(() => {
                   </ul>
                 </div>
               )}
-            </li>
+            </li> */}
+
+
+<li className="nav-item">
+  <span
+    className={`dropdown-icon ${
+      window.location.pathname !== '/' ? "dropdown__2" : "dropdown__"
+    }`}
+    onClick={() => {
+      const newLang = i18n.language === 'en' ? 'ar' : 'en';
+      changeLanguage(newLang);
+    }}
+    style={{
+      cursor: 'pointer',
+      display: 'flex',
+      alignItems: 'center',
+      padding: '8px 12px',
+      borderRadius: '8px',
+      border: window.location.pathname === "/" 
+        ? "2px solid white" 
+        : "2px solid gray",
+      userSelect: 'none'
+    }}
+  >
+    <span style={{ fontSize: '14px', fontWeight: '500' }}>
+      {i18n.language === 'en' ? 'العربية' : 'English'}
+    </span>
+  </span>
+</li>
+
+
             {/* User Dropdown - Now as regular list items in mobile */}
             {token && (
               <li className="nav-item" ref={dropdownRef}>

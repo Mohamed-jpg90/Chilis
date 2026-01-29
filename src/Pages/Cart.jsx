@@ -26,7 +26,7 @@ function Cart() {
   const updateQuantity = useCartStore((state) => state.updateCart)
   const setTotal = useCartStore((state) => state.setTotal);
   const startPayment = useCartStore((state) => state.startPayment)
-  const canPay = useCartStore ((state)=> state.canPay)
+  const canPay = useCartStore((state) => state.canPay)
 
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [loginPlease, setLoginPlease] = useState(token)
@@ -123,34 +123,33 @@ function Cart() {
     }
   }
 
-   const handeleDelet = async (id) => {
-      const swalWithBootstrapButtons = Swal.mixin({
-        customClass: {
-          confirmButton: "butttton",
-          cancelButton: "butttton2"
-        },
-        buttonsStyling: false
-      });
-  
-      swalWithBootstrapButtons.fire({
-        title: t('Profile.deleteConfirmTitle'),
-        text: t('Profile.deleteConfirmText'),
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: t('Profile.deleteConfirm'),
-        cancelButtonText: t('Profile.deleteCancel'),
-        reverseButtons: true
-      }).then((result)=>
-      {
-        if(result.isConfirmed){
-          useCartStore.getState().removeFromTheCart(id )
-        }
-        else{
-          console.log("halllow ")
-        }
-      });
-    };
-  
+  const handeleDelet = async (id) => {
+    const swalWithBootstrapButtons = Swal.mixin({
+      customClass: {
+        confirmButton: "butttton",
+        cancelButton: "butttton2"
+      },
+      buttonsStyling: false
+    });
+
+    swalWithBootstrapButtons.fire({
+      title: t('Profile.deleteConfirmTitle'),
+      text: t('Profile.deleteConfirmText'),
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: t('Profile.deleteConfirm'),
+      cancelButtonText: t('Profile.deleteCancel'),
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        useCartStore.getState().removeFromTheCart(id)
+      }
+      else {
+        console.log("halllow ")
+      }
+    });
+  };
+
 
   const { t, i18n } = useTranslation();
   const currentLanguage = i18n.language;
@@ -167,13 +166,13 @@ function Cart() {
     return sum + (itemPrice + extrasTotal) * item.quantity;
   }, 0);
 
-const deliveryFee = pickup
-  ? 0
-  : typeof addresscontainer?.deliveryFee === "number"
-    ? addresscontainer.deliveryFee
-    : 0;
-    
-    const taxRate = tax3 / 100;
+  const deliveryFee = pickup
+    ? 0
+    : typeof addresscontainer?.deliveryFee === "number"
+      ? addresscontainer.deliveryFee
+      : 0;
+
+  const taxRate = tax3 / 100;
 
   const tax2 = subtotal * taxRate;
   const totalDidscount = (subtotal + deliveryFee + tax2) * (discount / 100)
@@ -203,7 +202,7 @@ const deliveryFee = pickup
             address: addr.address1,
             id: addr.id,
             deliveryFee: addr?.area?.area_branches?.delivery_fees ?? 70
-             
+
           }));
           setAddressMessage(addresses);
         }
@@ -216,6 +215,8 @@ const deliveryFee = pickup
   useEffect(() => {
     fetchAddresses();
     handel_tax()
+    console.log(addresscontainer);
+
 
   }, []);
 
@@ -332,73 +333,85 @@ const deliveryFee = pickup
 
   const handelOrder = async () => {
 
-    if (credit) {
-      // جهز البيانات اللي هنبعتها لصفحة الدفع
-      const pendingOrder = {
-        pickup,
-        SelectedBranch,
-        addresscontainer,
-        cart,
-        total,
-        deliveryFee,
-        tax2,
-        discount
-      };
+    if (!token) {
+      navigate('/Login')
 
-      startPayment();
-      navigate("/payment");
-      return;
     }
+    else {
 
-    //----------------------------------------------------------//
-    // chash on delevery 
-    //----------------------------------------------------------//
-    else if (pickup && !SelectedBranch) {
-      toast.error("you must Select Branch");
-      return;
-    } else {
+      if (credit) {
+        const pendingOrder = {
+          pickup,
+          SelectedBranch,
+          addresscontainer,
+          cart,
+          total,
+          deliveryFee,
+          tax2,
+          discount
+        };
 
-      const deliveryType = pickup ? 2 : 1;
-      const paymentType = credit ? 2 : 1;
+        startPayment();
+        navigate("/payment");
+        return;
+      }
+
+      //----------------------------------------------------------//
+      // chash on delevery 
+      //----------------------------------------------------------//
+      else if (pickup && !SelectedBranch) {
+        toast.error("you must Select Branch");
+        return;
+
+      } else if (!pickup && (!addresscontainer || !addresscontainer.id)) {
+        toast.error(t('Cart.mustSelectAddress'));
+        return;
+      }
+      else {
+
+        const deliveryType = pickup ? 2 : 1;
+        const paymentType = credit ? 2 : 1;
 
 
-      const itemsData = {
-        items: cart.map((item) => ({
+        const itemsData = {
+          items: cart.map((item) => ({
 
-          id: item.infoID,
-          choices: [],
-          extras: item.extras.map((ex) => ex.id),
-          options: item.option ? [item.option.id] : [],
-          count: item.quantity,
-          special: item.special || ""
-        }))
-      };
-      const itemsString = JSON.stringify(itemsData);
-      const orderUrl = `${URL}/orders/create?delivery_type=${deliveryType}&payment=${paymentType}&lat=0&lng=0&address=${addresscontainer?.id}&area=10&branch=${SelectedBranch || 2}&items=${itemsString}&device_id=&notes=&time=&car_model=&car_color=&gift_cards=&coins=0.00&api_token=${token}`;
+            id: item.infoID,
+            choices: [],
+            extras: item.extras.map((ex) => ex.id),
+            options: item.option ? [item.option.id] : [],
+            count: item.quantity,
+            special: item.special || ""
+          }))
+        };
+        const itemsString = JSON.stringify(itemsData);
+        const orderUrl = `${URL}/orders/create?delivery_type=${deliveryType}&payment=${paymentType}&lat=0&lng=0&address=${addresscontainer?.id}&area=10&branch=${SelectedBranch || 2}&items=${itemsString}&device_id=&notes=&time=&car_model=&car_color=&gift_cards=&coins=0.00&api_token=${token}`;
 
-      try {
-        setLoading(true);
-        const res = await axios.post(orderUrl);
-        if (res.data.response === false) {
-          if (res.data.message === "Invalid Token") {
-            localStorage.removeItem("token");
-            setErrMessage(true);
+        try {
+          setLoading(true);
+          const res = await axios.post(orderUrl);
+          if (res.data.response === false) {
+            if (res.data.message === "Invalid Token") {
+              localStorage.removeItem("token");
+              setErrMessage(true);
+            } else {
+              toast.error(t('Cart.SomethingWrong'));
+            }
           } else {
-            toast.error(t('Cart.SomethingWrong'));
+            toast.success(t('Cart.OrderCreated'));
+            setOrderID(res.data.data.order_id);
+            console.log(res?.data?.data)
+            cleare();
           }
-        } else {
-          toast.success(t('Cart.OrderCreated'));
-          setOrderID(res.data.data.order_id);
-          console.log(res?.data?.data)
-          cleare();
+
+
+        } catch (e) {
+          console.log("Order error:", e);
+          toast.error("Something went wrong while creating the order");
+        } finally {
+          setLoading(false);
         }
 
-
-      } catch (e) {
-        console.log("Order error:", e);
-        toast.error("Something went wrong while creating the order");
-      } finally {
-        setLoading(false);
       }
 
 
@@ -412,9 +425,9 @@ const deliveryFee = pickup
   }, [total]); // to store the total and use it in the payment page 
 
 
-   useEffect(() => {
-   console.log("canPay:", canPay);
-   }, [canPay]);
+  useEffect(() => {
+    console.log("canPay:", canPay);
+  }, [canPay]);
 
 
   /////////////////////////////////////////////////
@@ -535,7 +548,7 @@ const deliveryFee = pickup
                               className="close-btn"
                               aria-label="Close popup"
                               onClick={() => {
-                           
+
                                 handeleDelet(item.id)
                               }}
                             >
@@ -757,13 +770,13 @@ const deliveryFee = pickup
                 size="small"
                 onClick={handelOrder}
                 loading={loading}
-                disabled={cart.length === 0 || !token}
+                disabled={cart.length === 0}
                 variant="outlined"
                 className='the_button2'
                 sx={{
                   width: "100%",
                   marginTop: "30px",
-                  backgroundColor: cart.length === 0 ? "gray" : "#f44336",
+                  backgroundColor: "#f44336",
                   border: 0,
                   borderRadius: "15px",
                   padding: "13px 10px",
@@ -950,7 +963,7 @@ const deliveryFee = pickup
       )}
 
 
-     {!loginPlease && (
+      {/* {!loginPlease && (
 
  
            <div className="overlay" onClick={() => setLoginPlease(true)}>
@@ -985,13 +998,13 @@ const deliveryFee = pickup
         </div>
       
 
-     )}
+     )} */}
 
-{/* //////////////////////////////////////////////////////// */}
+      {/* //////////////////////////////////////////////////////// */}
       {errMessage && (
         <LogInAgain />
       )}
- 
+
 
 
 
