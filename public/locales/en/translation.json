@@ -40,7 +40,7 @@
     "register": "Register",
     "noAddresses": "You have no addresses yet.",
     "cancel": "Cancel",
-    "add": "ADD",
+    "add": "Add New address",
     "addAddresses": "Add Addresses",
     "city": "City",
     "selectCity": "Select city",
@@ -97,7 +97,7 @@
     "order": "Order",
     "noAddressesYet": "You have no addresses yet.",
     "cancel": "Cancel",
-    "add": "ADD",
+    "add": "Add New address",
     "addAddresses": "Add Addresses",
     "city": "City",
     "selectCity": "Select city",
@@ -189,34 +189,51 @@
     "MyOrder" : "My Order"
   },
 
-  "myOrders": {
-    "title": "My Orders",
-    "orderHistory": "Order History",
-    "manageOrders": "Manage and track your orders",
-    "filters": {
-      "all": "All Orders",
-      "progress": "In Progress",
-      "completed": "Completed",
-      "cancelled": "Cancelled"
-    },
-    "order": "Order",
-    "total": "Total",
-    "viewDetails": "View Details",
-    "noOrders": "No orders found",
-    "orderDetails": "Order Details",
-    "orderID": "Order ID",
-    "date": "Date",
-    "status2": "Status",
-    "items": "Items",
-    "taxFees": "Tax Fees",
-    "deliveryFees": "Delivery Fees",
-    "status": {
-      "processing": "Processing",
-      "completed": "Completed",
-      "cancelled": "Cancelled",
-      "new":"New"
-    }
+"myOrders": {
+  "title": "My Orders",
+  "orderHistory": "Order History",
+  "manageOrders": "Manage and track your orders",
+
+  "filters": {
+    "all": "All Orders",
+    "progress": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
   },
+
+  "order": "Order",
+  "total": "Total",
+  "viewDetails": "View Details",
+  "noOrders": "No orders found",
+
+  "orderDetails": "Order Details",
+  "orderID": "Order ID",
+  "date": "Date",
+  "status2": "Status",
+  "items": "Items",
+
+  "paymentType": "Payment Type",
+  "cash": "Cash",
+  "online": "Online Payment",
+
+  "deliveryFee": "Delivery Fee",
+  "deliveryFees": "Delivery Fees",
+  "taxFees": "Tax Fees",
+
+  "notes": "Notes",
+  "total_extras_price": "Extras Total",
+  "subTotal": "Subtotal",
+  "totalAmount": "Total Amount",
+  "price":"price",
+
+  "status": {
+    "processing": "Processing",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "new": "New"
+  }
+},
+
   "common": {
     "currency": "EGP",
      "showMore": " Show More",

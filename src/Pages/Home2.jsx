@@ -50,7 +50,7 @@ useEffect(()=>{
             {t('home.contactUs')}
           </HashLink>
         </div>
-      </div>
+      </div> 
 
       {/* Section 2 - About Us */}
 {/* Section 2 - About Us */}

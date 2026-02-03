@@ -38,7 +38,7 @@
     "register": "التسجيل",
     "noAddresses": "ليس لديك عناوين بعد.",
     "cancel": "إلغاء",
-    "add": "إضافة",
+    "add": "إضافة عنوان جديد",
     "addAddresses": "إضافة عناوين",
     "city": "المدينة",
     "selectCity": "اختر المدينة",
@@ -94,7 +94,7 @@
     "order": "اطلب",
     "noAddressesYet": "ليس لديك عناوين بعد.",
     "cancel": "إلغاء",
-    "add": "إضافة",
+    "add": "إضافة عنوان جديد",
     "addAddresses": "إضافة عناوين",
     "city": "المدينة",
     "selectCity": "اختر المدينة",
@@ -192,34 +192,51 @@
   },
 
 
- "myOrders": {
-    "title": "طلباتي",
-    "orderHistory": "سجل الطلبات",
-    "manageOrders": "إدارة وتتبع طلباتك",
-    "filters": {
-      "all": "جميع الطلبات",
-      "progress": "قيد التنفيذ",
-      "completed": "مكتمل",
-      "cancelled": "ملغي"
-    },
-    "order": "طلب",
-    "total": "الإجمالي",
-    "viewDetails": "عرض التفاصيل",
-    "noOrders": "لا توجد طلبات",
-    "orderDetails": "تفاصيل الطلب",
-    "orderID": "رقم الطلب",
-    "date": "التاريخ",
-    "status2": "الحالة",
-    "items": "العناصر",
-    "taxFees": "الضريبة",
-    "deliveryFees": "رسوم التوصيل",
-    "status": {
-      "processing": "قيد المعالجة",
-      "completed": "مكتمل",
-      "cancelled": "ملغي",
-      "new":"جديد"
-    }
+"myOrders": {
+  "title": "طلباتي",
+  "orderHistory": "سجل الطلبات",
+  "manageOrders": "إدارة وتتبع طلباتك",
+
+  "filters": {
+    "all": "جميع الطلبات",
+    "progress": "قيد التنفيذ",
+    "completed": "مكتمل",
+    "cancelled": "ملغي"
   },
+
+  "order": "طلب",
+  "total": "الإجمالي",
+  "viewDetails": "عرض التفاصيل",
+  "noOrders": "لا توجد طلبات",
+
+  "orderDetails": "تفاصيل الطلب",
+  "orderID": "رقم الطلب",
+  "date": "التاريخ",
+  "status2": "الحالة",
+  "items": "العناصر",
+
+  "paymentType": "طريقة الدفع",
+  "cash": "نقدًا",
+  "online": "دفع إلكتروني",
+
+  "deliveryFee": "رسوم التوصيل",
+  "deliveryFees": "رسوم التوصيل",
+  "taxFees": "الضريبة",
+
+  "notes": "ملاحظات",
+  "total_extras_price": "إجمالي الإضافات",
+  "price":"سعر الوجبه",
+  "subTotal": "الإجمالي الفرعي",
+  "totalAmount": "المبلغ الإجمالي",
+
+  "status": {
+    "processing": "قيد المعالجة",
+    "completed": "مكتمل",
+    "cancelled": "ملغي",
+    "new": "جديد"
+  }
+}
+,
   "common": {
     "currency": "ج.م",
   "showMore": "عرض المزيد",

@@ -54,28 +54,36 @@ function Profile() {
     window.location.reload();
   };
 
-  const fetchAddresses = async () => {
-    try {
-      const res = await axios.get(`${URL}/profile/address?api_token=${token}`);
-      if(res.data.response == false ){
-        if(res.data.message === "Invalid Token" ) {
-          localStorage.removeItem("token")
-          setErrMessage(true)
-        }
-        else toast.error(t('Profile.somethingWrong'))
+const fetchAddresses = async () => {
+  try {
+    const res = await axios.get(`${URL}/profile/address?api_token=${token}`);
+
+    if (res.data.response == false) {
+      if (res.data.message === "Invalid Token") {
+        localStorage.removeItem("token");
+        setErrMessage(true);
+      } else {
+        toast.error(t('Profile.somethingWrong'));
       }
-      else{
-        const addresses = res.data.data.address.map(addr => ({
-          name: addr.address_name,
-          address: addr.address1,
-          id: addr.id
-        }));
-        setAddressMessage(addresses);
+    } else {
+      const addresses = res.data.data.address.map(addr => ({
+        name: addr.address_name,
+        address: addr.address1,
+        id: addr.id
+      }));
+
+      setAddressMessage(addresses);
+//////////////////////////////// if there is one address 
+      if (addresses.length === 1) {
+        addnewadd(addresses[0]);
+        setSelectAddressStyle(addresses[0].id);
       }
-    } catch (e) {
-      console.log("the error is :", e);
     }
-  };
+  } catch (e) {
+    console.log("the error is :", e);
+  }
+};
+
 
   useEffect(() => {
     fetchAddresses();
@@ -270,7 +278,8 @@ function Profile() {
                   <p className="no-address">{t('Profile.noAddresses')}</p>
                 ) : (
                   addressMessage.map((msg) => (
-                    <div key={msg.id} className={`the_addresses ${selectAddressStyle === msg.id ? 'active_address ' : ''} `} onClick={() => handeleChooseAddress(msg)} >
+                    <div key={msg.id} className={`the_addresses ${selectAddressStyle === msg.id ? 'active_address ' : ''} `} 
+                    onClick={() => handeleChooseAddress(msg)} >
                       <p className='topOfTheMessage'>
                         {msg.name}
                         <button
@@ -280,7 +289,7 @@ function Profile() {
                             handeleDelet(msg.id)
                           }}
                         >
-                          <FaRegTrashAlt className=' fs-5 ' style={{color:"black"}}  />
+                          <FaRegTrashAlt className=' fs-5 '  />
                         </button>
                       </p>
                       <p className='AddressMessage'>{msg.address}</p>

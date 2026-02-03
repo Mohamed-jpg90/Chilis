@@ -381,7 +381,7 @@ function Cart() {
             extras: item.extras.map((ex) => ex.id),
             options: item.option ? [item.option.id] : [],
             count: item.quantity,
-            special: item.special || ""
+            special: item.special || "",
           }))
         };
         const itemsString = JSON.stringify(itemsData);
@@ -599,7 +599,7 @@ function Cart() {
           <hr />
           {/* ////////////////////////////////////////////////////////////////////////////////////////////////// */}
 
-          <div className='coupon_section' style={{
+          {/* <div className='coupon_section' style={{
             width: "100%",
 
             display: "flex",
@@ -619,7 +619,7 @@ function Cart() {
               }
             />
 
-            {/* APPLY button: يظهر لو طول الكوبون أقل من 1 */}
+          
             {!cancel && (
               <Button
                 size="small"
@@ -644,7 +644,6 @@ function Cart() {
               </Button>
             )}
 
-            {/* CANCEL button: يظهر لو طول الكوبون أكبر من 1 */}
             {cancel && (
               <Button
                 size="small"
@@ -674,7 +673,81 @@ function Cart() {
               </p>
             )}
 
-          </div>
+          </div> */}
+
+          <div className="coupon_wrapper">
+  <div className="coupon_box">
+    <input
+      type="text"
+      placeholder={t('Apply.placeHolder')}
+      value={coupon}
+      className="coupon_input"
+      onChange={(e) => {
+        setCoupon(e.target.value);
+        setCancel(false);
+      }}
+    />
+
+    {!cancel && (
+              <Button
+                size="small"
+                loading={loading}
+                onClick={handleApplyCoupon}
+                variant="outlined"
+                className='the_button2'
+                sx={{
+                  width: "20%",
+                 
+                  marginTop: "20px",
+                  backgroundColor: "#f44336",
+                  border: "3px solid #f44336",
+                  color: "white",
+                  fontWeight: 700,
+                  borderRadius: "0px",
+                  padding: "8px 8px",
+                  cursor: "pointer",
+                  transition: "0.5s",
+                }}
+              >
+                {t('Apply.Apply')}
+              </Button>
+            )}
+
+   {cancel && (
+              <Button
+                size="small"
+                onClick={handleCancelCoupon}
+                variant="outlined"
+                sx={{
+                  width: "20%",
+                  marginTop: "-2px",
+                  backgroundColor: "gray",
+                  border: "3px solid gray",
+                  color: "white",
+                  fontWeight: 700,
+                  borderRadius: "0px",
+                  padding: "8px 8px",
+                  cursor: "pointer",
+                  transition: "0.5s",
+                }}
+              >
+                {t('cancel')}
+              </Button>
+            )}
+
+  </div>
+
+  {couponError && (
+    <p className="coupon_message error">{couponError}</p>
+  )}
+
+  {discount > 0 && (
+    <p className="coupon_message success">
+      {`You have ${discount}% discount 🎉`}
+    </p>
+  )}
+</div>
+
           <br />
 
           {/* ////////////////////////////////////////////////////////////////////////////////////////////////////////// */}

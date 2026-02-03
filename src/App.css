@@ -197,7 +197,7 @@ label {
 }
 
 .active_address {
-  border: 2px solid black;
+  border: 3px solid var(--secondary_color);
   background-color: var(--hover_background);
 }
 
@@ -856,6 +856,7 @@ input:focus {
   background: var(--body_background);
   color: var(--body_color);
   border: 1px solid var(--item_border);
+
 }
 
 .close-btn:hover {
@@ -1221,20 +1222,30 @@ input:focus {
 }
 
 /* Modal header - title + close button */
-.modal_header {
+.modal_header3 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  text-transform: uppercase;
+  padding: 2rem;
+  background-color: #cccccc;
+
 }
 
-.modal_header h2 {
+.modal_header3 h5 {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--body_color);
 }
-
+.modal_header3 > :nth-child(2) {
+  width: 25%;
+  flex-shrink: 0;
+}
+.modal_header3 > :nth-child(1) {
+  width: 12%;
+  flex-shrink: 0;
+}
 .close-btn {
   background: transparent;
   border: none;
@@ -1280,7 +1291,7 @@ input:focus {
 }
 
 .btn-secondary:hover {
-  background-color: var(--hover_background);
+  background-color: var(--secondary_color);
 }
 
 .modal-actions button:not(.btn-secondary) {
@@ -1397,15 +1408,15 @@ input:focus {
   right: 2%;
   top: 50%;
   transform: translate(0, -50%);
-  color: var(--primary_color);
+  color: var(--hover_background)
 }
 
 .delet_addAR {
   position: absolute;
-  right: 90%;
+  right: 95%;
   top: 50%;
   transform: translate(0, -50%);
-  color: var(--primary_color);
+  color: var(--hover_background);
 }
 
 .butttton {
@@ -1918,9 +1929,9 @@ input:focus {
 .modal_content {
   background: var(--modal_background);
   border-radius: 12px;
-  padding: 2rem;
-  max-width: 500px;
-  width: 90%;
+  padding: 0px 0rem;
+  max-width: 80%;
+  width: 100%;
   max-height: 80vh;
   overflow-y: auto;
   color: var(--body_color);
@@ -1957,37 +1968,61 @@ input:focus {
 }
 
 .detail_row {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5rem 0;
+  padding: 2rem ;
   border-bottom: 1px solid var(--border_light);
   color: var(--body_color);
 }
 
 .detail_row.total {
   font-weight: bold;
-  font-size: 1.1rem;
+  font-size: 1rem;
   border-bottom: none;
-  border-top: 2px solid var(--border_light);
-  margin-top: 1rem;
-  padding-top: 1rem;
+  /* border-top: 2px solid var(--border_light); */
+  margin-top: 0.25rem;
+  padding-top: 0.25rem;
+  width: 100%;
+}
+.paymentType {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(30%, 3fr));
+  justify-content: center;
+  text-align: center;
+  gap: 3rem;
+  padding: 0 0rem;
+}
+.paymentType h5{
+display: inline-block;
+  font-size:1.1rem ;
+  margin-right: 4px;
+}
+.paymentType > dev {
+  width: 30%;
 }
 
 .items_list {
-  margin: 1rem 0;
+  margin: 0rem 0;
 }
 
 .items_list h4 {
-  margin: 0 0 1rem 0;
+  margin: 0 0 0rem 0;
   color: var(--body_color);
 }
 
 .item_detail {
   display: flex;
   justify-content: space-between;
-  padding: 0.5rem 0;
+  padding: 2rem;
   border-bottom: 1px solid var(--border_light);
   color: var(--body_color);
+  align-items: center;
+}
+.item_detail > :first-child {
+  width: 20%;
+  flex-shrink: 0;
+}
+.item_detail > :nth-child(2) {
+  width: 35%;
+  flex-shrink: 0;
 }
 
 /* Responsive */
@@ -2022,9 +2057,65 @@ input:focus {
 
 /* ////////////coupon input ////////////// */
 
-.btn-secondary:hover {
-  background-color: gray;
-  color: inherit;
-  border-color: inherit;
-  box-shadow: none;
+.coupon_wrapper {
+  width: 100%;
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
+
+.coupon_box {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.coupon_input {
+  width: 70%;
+  padding: 10px 12px;
+  border: 1px solid #000;
+  outline: none;
+  font-size: 14px;
+}
+
+.coupon_btn {
+  width: 20%;
+  font-weight: 700;
+  border-radius: 0px;
+  padding: 8px;
+  cursor: pointer;
+  transition: 0.5s;
+}
+
+/* 👇 نفس الألوان اللي عندك */
+.apply_btn {
+  background-color: #f44336;
+  border: 3px solid #f44336;
+  color: white;
+}
+
+.cancel_btn {
+  background-color: gray;
+  border: 3px solid gray;
+  color: white;
+}
+
+/* messages */
+.coupon_message {
+  margin-top: 8px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.coupon_message.error {
+  color: #f44336;
+}
+
+.coupon_message.success {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+/* /////////////////////////////////////////////////////////// */

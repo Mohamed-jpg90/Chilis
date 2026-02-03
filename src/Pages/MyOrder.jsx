@@ -24,7 +24,7 @@ function MyOrder() {
         const fetch_history_order = async () => {
             try {
                 const res = await axios.get(`${URL}/user/history?api_token=${token}`);
-                console.log("API response:", res.data.data.details);
+                // console.log("API response:", res.data.data.details);
 
                 if (res.data.message === "Invalid Token") {
                     localStorage.removeItem("token");
@@ -70,14 +70,27 @@ function MyOrder() {
                 creatAt: item.created_at,
                 status: item.status,
                 total: item.total,
+                notes: item.notes,
+           payment_method: item.payment_method,
+                delivery_type: item.delivery_type,
                 delivery_fees: item.delivery_fees,
                 tax_fees: item.tax_fees,
+
+                address1: item?.address?.address1,
                 items: item.items.map(e => ({
                     mealId: e.id,
                     name_en: e.name.name_en,
                     name_ar: e.name.name_ar,
                     quantity: e.count,
-                    price: e.total_price
+                    price: e.total_price,
+                    total_extras_price: e.total_extras_price,
+                    special:e.special
+                })),
+
+                branch: item.branch.map(e => ({
+                    address_ar: e.address_ar,
+                    address_en: e.address_en,
+
                 }))
             }))
             console.log(res.data.data.order[0]);
@@ -198,74 +211,124 @@ function MyOrder() {
             {selectedOrder && (
                 <div className="modal_overlay" onClick={() => setSelectedOrder(false)}>
                     <div className="modal_content" onClick={(e) => e.stopPropagation()}>
-                        {orderDetails.map((item, index) => (
-                            <div key={index}>
-                                <div className="modal_header">
-                                    <h3>{t('myOrders.orderDetails')} - #{item.id}</h3>
-                                    <button className="close_btn fs-2 " onClick={() => setSelectedOrder(false)}>×</button>
+                        {orderDetails.map((item) => (
+                            <div key={item.id}>
+                                <div className="modal_header3">
+                                    <h5>{t('myOrders.items')}</h5>
+                                    <h5>{t('myOrders.notes')}</h5>
+                                    <h5>{t('myOrders.price')}</h5>
+                                    <h5>{t('myOrders.total')}</h5>
                                 </div>
+                                <div className="items_list">
+                                    {item.items.map((meal, index) => (
+                                        <div key={index} className="item_detail">
+                                            <span>
+                                                {meal.quantity}x {lan === 'ar' ? meal.name_ar : meal.name_en}
+                                            </span>
 
-                                <div className="order_details">
-                                    <div className="detail_row">
-                                        <span>{t('myOrders.orderID')}:</span>
-                                        <span>{item.id}</span>
-                                    </div>
+                                            {/* price for single item */}
+                                            <span>
+                                                <span className="">
+                                                 {meal.special || '--'}
+                                                </span>
+                                            </span>
 
-                                    <div className="detail_row">
-                                        <span>{t('myOrders.date')}:</span>
-                                        <span>{item.creatAt}</span>
-                                    </div>
+                                            {/* extras */}
+                                            <span>
 
-                                    <div className="detail_row">
-                                        <span>{t('myOrders.status2')}:</span>
-                                        <span>
-                                            {item.status === "Processing" && t('myOrders.status.processing')}
-                                            {item.status === "Completed" && t('myOrders.status.completed')}
-                                            {item.status === "Cancelled" && t('myOrders.status.cancelled')}
-                                            {item.status === "New" && t('myOrders.status.new')}
-                                            {!["Processing", "Completed", "Cancelled", "New"].includes(item.status) &&
-                                                item.status.charAt(0).toUpperCase() + item.status.slice(1)
-                                            }
+                                                {(meal.price / meal.quantity).toFixed(2)} {t('common.currency')}
 
-                                        </span>
-                                    </div>
+                                            </span>
 
-                                    <div className="items_list">
-                                        <h4>{t('myOrders.items')}:</h4>
-                                        {item.items.map((meal, index) => (
-                                            <div key={index} className="item_detail">
-                                                <span>{meal.quantity}x {lan === 'ar' ? meal.name_ar : meal.name_en}</span>
-                                                <span>{Number(meal.price).toFixed(2)} {t('common.currency')}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    <div className="total_section">
-                                        <div className="detail_row total d-flex flex-column">
-                                            <div className=' detail_row fs-6 d-flex justify-content-between ' >
-                                                <div className=' text-secondary'>
-                                                    <span>{t('myOrders.taxFees')}:</span>
-                                                    <span className='ms-3 text-secondary '>{item.tax_fees} {t('common.currency')}</span>
-                                                </div>
-                                                <div className='text-secondary' >
-                                                    <span>{t('myOrders.deliveryFees')}:</span>
-                                                    <span className='ms-3 text-secondary ' >{item.delivery_fees} {t('common.currency')}</span>
-                                                </div>
-                                            </div>
-                                            <div className=' detail_row ' >
-                                                <span>{t('myOrders.total')}:</span>
-                                                <span>{item.total} {t('common.currency')}</span>
-                                            </div>
+                                            {/* total item price */}
+                                            <span>
+                                                {Number(meal.price).toFixed(2)} {t('common.currency')}
+                                            </span>
                                         </div>
+                                    ))}
+                                </div>
+
+
+
+                                <div className="detail_row total">
+
+                                    <div className="paymentType">
+
+                                        <div>
+                                            <h5>{t('myOrders.paymentType')} :</h5>
+                                            <span className="text-secondary">
+                                                {item.delivery_type === '1'
+                                                    ? t('myOrders.cash')
+                                                    : t('myOrders.online')}
+                                            </span>
+                                        </div>
+
+                                        <div>
+                                            <h5>{t('myOrders.deliveryFee')} :</h5>
+                                            <span className="text-secondary">
+                                                {Number(item.delivery_fees || 0).toFixed(2)} {t('common.currency')}
+                                            </span>
+                                        </div>
+
+                                        <div>
+                                            <h5>{t('myOrders.taxFees')} :</h5>
+                                            <span className="text-secondary">
+                                                {Number(item.tax_fees || 0).toFixed(2)} {t('common.currency')}
+                                            </span>
+                                        </div>
+
+                                    </div>
+
+                                    <div className="paymentType mt-3 d">
+
+                                        <div>
+                                            <h5>{t('myOrders.total_extras_price')} :</h5>
+                                            <span className="text-secondary">
+                                            {Number(
+                                                item.items.reduce(
+                                                    (sum, m) => sum + Number(m.total_extras_price || 0),
+                                                    0
+                                                )
+                                            ).toFixed(2)} {t('common.currency')}
+                                            </span>
+                                        </div>
+
+                                        <div>
+                                            <h5>{t('myOrders.subTotal')} :</h5>
+                                            <span className="text-secondary">
+                                                {Number(
+                                                    item.items.reduce(
+                                                        (sum, m) => sum + Number(m.price || 0),
+                                                        0
+                                                    )
+                                                ).toFixed(2)} {t('common.currency')}
+                                            </span>
+                                        </div>
+
+                                        <div>
+                                            <h5>{t('myOrders.totalAmount')} :</h5>
+                                            <span className="text-secondary">
+                                                {Number(item.total).toFixed(2)} {t('common.currency')}
+                                            </span>
+                                        </div>
+
                                     </div>
                                 </div>
+
+
+
                             </div>
+
+
                         ))}
                     </div>
                 </div>
             )}
+
         </div>
     )
 }
-
 export default MyOrder
+
+
+
