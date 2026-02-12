@@ -265,6 +265,30 @@ label {
   text-align: left;
 
 }
+@media  ( max-width : 750px) {
+  
+.foo_text {
+ 
+  max-width: 30%;
+  color: var(--body_color);
+  font-size: 12px;
+
+}
+.image3 {
+  width: 80px;
+  height: auto;
+}
+
+.ffoo {
+  
+  text-align: center;
+  padding: 10px 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  
+}
+}
 
 /* ///////////////////////////////////////////////// */
 /* home2 */
@@ -490,10 +514,16 @@ iframe {
 .the_regester {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  width: 80%;
   max-width: 500px;
   padding: 10px 0px;
   margin: 20px 0;
+}
+.the_regester2{
+    display: flex;
+  flex-direction: column;
+  width: 100%;
+
 }
 
 input {
@@ -580,14 +610,7 @@ input:focus {
     padding: 8px;
   }
 
-  .the_regester {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: 500px;
-    padding: 10px 30px;
-    margin: 20px 0;
-  }
+
 
 
   .the_button2 {

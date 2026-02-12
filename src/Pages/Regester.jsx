@@ -7,8 +7,12 @@ import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import NaveBare from './NaveBare';
-import LoadingButton from '@mui/lab/LoadingButton';
+import Button from '@mui/material/Button';
 import { useTranslation } from 'react-i18next';
+
+import { useForm } from 'react-hook-form';
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod';
 
 const URL = "https://myres.me/chilis-dev/api";
 
@@ -28,72 +32,59 @@ function Regester({ onLoginSuccess }) {
   const { t, i18n } = useTranslation();
   const currentLanguage = i18n.language;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
 
-    if (!email || !password || !fullName || !number) {
-      toast.error(t('Register.completeAllFields'))
-      setCorrect(false)
-    }
-    else if (password.length < 6) {
-      setErrorMessage(t('Register.passwordLength'))
-      toast.error(t('Register.passwordLength'))
-      setCorrect(false)
-    } else if (!email.includes('@') || !email.includes('.')) {
-      toast.error(t('Register.invalidEmail'))
-      setCorrect(false)
-    } else if (fullName.length < 2) {
-      toast.error(t('Register.nameLength'))
-    } else if (isNaN(number)) {
-      toast.error(t('Register.invalidPhone'))
-    }
-    else {
-      setLoading(true)
-      try {
-        const res = await axios.post(`${URL}/register?first_name=${fullName}&email=${email}&password=${password}&phone=${number}`)
+  const regesterSchima = z.object({
+    fullName: z.string().min(1, "user name is required"),
+    phone: z.string().min(1, "phone numper is required").regex(/^[0-9]+$/, "phone must be numbers only"),
+    email: z.string().min(1, "email is required").email("email is in valid"),
+    password: z.string().min(6, "password should contain at least 6 chatacter ")
 
-        const user = res.data.data.user;
-        const token = res.data.data.token;
+  })
 
-        localStorage.setItem('user_name', user.user_name);
-        localStorage.setItem('user_id', user.id);
-        localStorage.setItem('user_email', user.email);
-        localStorage.setItem('user_phone', user.phone);
-        localStorage.setItem('token', token);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting }
+  } = useForm({
+    resolver: zodResolver(regesterSchima),
 
-        setFullName('');
-        setEmail('');
-        setPassword('');
-        setNumber('');
-        setShowProfile(true);
-        setErrorMessage('')
-        setCorrect(true)
-        toast.success(t('Register.success'))
-        onLoginSuccess(token)
-        navigate('/')
-
-      } catch (err) {
-        const res = await axios.post(`${URL}/register`, null, {
-          params: {
-            first_name: fullName,
-            email: email,
-            password: password,
-            phone: number
-          }
-        });
-
-        console.log(res.data.messages)
-        setCorrect(false);
-        if (res.data.messages) {
-          toast.error(res.data.messages[0])
-        } else {
-          setErrorMessage(t('Register.failed'));
-        }
-      } finally {
-        setLoading(false)
-      }
-    };
+    mode: 'onChange'
   }
+  )
+
+  const onSubmit = async (data) => {
+
+    try {
+      const res = await axios.post(`${URL}/register?first_name=${data.fullName}&email=${data.email}&password=${data.password}&phone=${data.phone}`)
+
+      const user = res.data.data.user;
+      const token = res.data.data.token;
+
+      localStorage.setItem('user_name', user.user_name);
+      localStorage.setItem('user_id', user.id);
+      localStorage.setItem('user_email', user.email);
+      localStorage.setItem('user_phone', user.phone);
+      localStorage.setItem('token', token);
+
+
+      setShowProfile(true);
+      setCorrect(true)
+      toast.success(t('Register.success'))
+      onLoginSuccess(token)
+      navigate('/')
+
+    } catch (err) {
+      console.log(err);
+
+      if (err.response?.data?.messages) {
+        toast.error(err.response.data.messages[0]);
+      } else {
+        toast.error(t('Register.failed'));
+      }
+    }
+  };
+
 
   return (
     <div className='regester' dir={currentLanguage === 'ar' ? 'rtl' : 'ltr'}>
@@ -104,63 +95,73 @@ function Regester({ onLoginSuccess }) {
       <div className='container2'>
         <div className='the_regester' >
           <h2 className='header2'>{t('Register.title')}</h2>
-          <input
-            type='text'
-            placeholder={t('Register.fullNamePlaceholder')}
-            className='user_name'
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-          />
-          <input
-            type='text'
-            placeholder={t('Register.phonePlaceholder')}
-            className='user_num'
-            value={number}
-            onChange={(e) => setNumber(e.target.value)}
-          />
-          <input
-            type='email'
-            placeholder={t('Register.emailPlaceholder')}
-            className='user_email'
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            type='password'
-            placeholder={t('Register.passwordPlaceholder')}
-            className='user_password'
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <LoadingButton
-            size="small"
-            onClick={handleSubmit}
-            loading={loading}
-            variant="outlined"
-            className='the_button2'
-            sx={{
-              marginTop: "30px",
-              backgroundColor: "#f44336",
-              border: 0,
-              borderRadius: "15px",
-              padding: "13px 10px",
-              cursor: "pointer",
-              transition: "0.5s",
-              border: "3px solid #f44336",
-              color: "white",
-              fontWeight: 900,
-              fontSize: {
-                xs: "10px",
-                sm: "14px",
-                md: "15px",
-              },
-            }}
-          >
-            {t('Register.createAccountButton')}
-          </LoadingButton>
+          <form onSubmit={handleSubmit(onSubmit)} className='the_regester2'>
+            <input
+              type='text'
+              placeholder={t('Register.fullNamePlaceholder')}
+              className='user_name'
+              {...register('fullName')}
+            />
+            {errors.fullName && <p style={{ color: "red", fontSize: "15px" }}>{errors.fullName.message}</p>}
+
+            <input
+              type='text'
+              placeholder={t('Register.phonePlaceholder')}
+              className='user_num'
+              {...register('phone')}
+
+            />
+            {errors.phone && <p style={{ color: "red", fontSize: "15px" }}>{errors.phone.message}</p>}
+
+            <input
+              type='email'
+              placeholder={t('Register.emailPlaceholder')}
+              className='user_email'
+
+              {...register('email')}
+
+            />
+            {errors.email && <p style={{ color: "red", fontSize: "15px" }}>{errors.email.message}</p>}
+
+            <input
+              type='password'
+              placeholder={t('Register.passwordPlaceholder')}
+              className='user_password'
+              {...register('password')}
+            />
+            {errors.password && <p style={{ color: "red", fontSize: "15px" }}>{errors.password.message}</p>}
+
+            <Button
+              size="small"
+              type='submit'
+              variant="outlined"
+              className='the_button2'
+              disabled={isSubmitting}
+              sx={{
+                marginTop: "30px",
+                backgroundColor: "#f44336",
+                border: 0,
+                borderRadius: "15px",
+                padding: "13px 10px",
+                cursor: "pointer",
+                transition: "0.5s",
+                border: "3px solid #f44336",
+                color: "white",
+                fontWeight: 900,
+                fontSize: {
+                  xs: "10px",
+                  sm: "14px",
+                  md: "15px",
+                },
+              }}
+            >
+              {isSubmitting ? "Loading..." : t("Login.loginButton")}
+            </Button>
+
+          </form>
 
           <p className='button7'>
-            {t('Register.haveAccount')} 
+            {t('Register.haveAccount')}
             <Link to={'/LogIn'} className='link7'>
               {t('Register.loginLink')}
             </Link>

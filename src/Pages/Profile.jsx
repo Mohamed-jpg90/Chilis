@@ -5,11 +5,11 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import Swal from 'sweetalert2';
 import NaveBare from './NaveBare';
-import LoadingButton from '@mui/lab/LoadingButton';
 import { useCartAddresses } from '../store/CartStore';
-import { FaRegTrashAlt } from "react-icons/fa";
 import LogInAgain from './LogInAgain';
 import { useTranslation } from 'react-i18next';
+import AddressModal from './AddressModal'
+import AddAddresses from './AddAddresses'
 
 const URL = "https://myres.me/chilis-dev/api";
 
@@ -45,44 +45,37 @@ function Profile() {
   const currentLanguage = i18n.language;
 
   // Helper function to get display name based on current language
-  const getDisplayName = (item) => {
-    return currentLanguage === 'ar' && item.namear ? item.namear : item.name;
-  };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    window.location.reload();
-  };
 
-const fetchAddresses = async () => {
-  try {
-    const res = await axios.get(`${URL}/profile/address?api_token=${token}`);
+  const fetchAddresses = async () => {
+    try {
+      const res = await axios.get(`${URL}/profile/address?api_token=${token}`);
 
-    if (res.data.response == false) {
-      if (res.data.message === "Invalid Token") {
-        localStorage.removeItem("token");
-        setErrMessage(true);
+      if (res.data.response == false) {
+        if (res.data.message === "Invalid Token") {
+          localStorage.removeItem("token");
+          setErrMessage(true);
+        } else {
+          toast.error(t('Profile.somethingWrong'));
+        }
       } else {
-        toast.error(t('Profile.somethingWrong'));
-      }
-    } else {
-      const addresses = res.data.data.address.map(addr => ({
-        name: addr.address_name,
-        address: addr.address1,
-        id: addr.id
-      }));
+        const addresses = res.data.data.address.map(addr => ({
+          name: addr.address_name,
+          address: addr.address1,
+          id: addr.id
+        }));
 
-      setAddressMessage(addresses);
-//////////////////////////////// if there is one address 
-      if (addresses.length === 1) {
-        addnewadd(addresses[0]);
-        setSelectAddressStyle(addresses[0].id);
+        setAddressMessage(addresses);
+        //////////////////////////////// if there is one address 
+        if (addresses.length === 1) {
+          addnewadd(addresses[0]);
+          setSelectAddressStyle(addresses[0].id);
+        }
       }
+    } catch (e) {
+      console.log("the error is :", e);
     }
-  } catch (e) {
-    console.log("the error is :", e);
-  }
-};
+  };
 
 
   useEffect(() => {
@@ -94,130 +87,10 @@ const fetchAddresses = async () => {
     setAddAddress(false)
   };
 
-  const handeleAddAddress = async () => {
-    setPopUp(false)
-    setAddAddress(true)
-    try {
-      const res = await axios.get(`${URL}/cities`)
-      const x = res.data.data.cities.map(city => ({
-        name: city.name_en,
-        namear: city.name_ar,
-        id: city.id
-      }))
-      setCityNameId(x)
-    } catch (e) {
-      console.log("the error :", e)
-    }
-  }
 
-  const addNewAddress = async (e) => {
-    e.preventDefault()
 
-    if (
-      !area?.trim() ||
-      !street?.trim() ||
-      !bulding?.trim() ||
-      !floor?.trim() ||
-      !Apartment?.trim() ||
-      !addName?.trim()
-    ) {
-      toast.error(t('Profile.completeAllRequirements'))
-      return;
-    }
-    else {
-      setLoading(true)
-      try {
-        const Basicurl = `${URL}/profile/address/add?area=${area}&street=${street}&building=${bulding}&floor=${floor}&apt=${Apartment}&name=${addName}&lat=20.222222&lng=30.333333&api_token=${token}`
-        console.log("Basicurl:", Basicurl);
-        const res = await axios.post(`${Basicurl}`);
 
-        console.log("Address added successfully:", res.data);
 
-        // Reset form after success
-        setArea("");
-        setStreet("");
-        setBulding("");
-        setFloor("");
-        setApartment("");
-        setAddName("");
-        setErrMessage(false);
-
-        setAddAddress(false);
-        await fetchAddresses()
-        toast.success(t('Profile.addSuccess'))
-        setPopUp(true)
-      } catch (e) {
-        console.error("Error adding address:", e);
-      } finally {
-        setLoading(false)
-      }
-    }
-  };
-
-  const handeleCity = async (x) => {
-    try {
-      const res = await axios.get(`${URL}/areas?city=${x}`);
-      const mes = res.data.data.areas.map((area) => ({
-        name: area.area_name_en,
-        namear: area.area_name_ar,
-        id: area.id
-      }))
-      setAreaContainer(mes)
-    } catch (e) {
-      console.log("the error is :", e);
-    }
-  };
-
-  const handeleDelet = async (x) => {
-    const swalWithBootstrapButtons = Swal.mixin({
-      customClass: {
-        confirmButton: "butttton",
-        cancelButton: "butttton2"
-      },
-      buttonsStyling: false
-    });
-
-    swalWithBootstrapButtons.fire({
-      title: t('Profile.deleteConfirmTitle'),
-      text: t('Profile.deleteConfirmText'),
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: t('Profile.deleteConfirm'),
-      cancelButtonText: t('Profile.deleteCancel'),
-      reverseButtons: true
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const res = await axios.post(
-            `${URL}/profile/address/delete/${x}?api_token=${token}`
-          );
-
-          if (res.data.data.message == "Address Removed Successfully") {
-            setAddressMessage(prev => prev.filter(addr => addr.id != x))
-            toast.success(t('Profile.deleteSuccess'))
-
-            if (addresscontainer?.id === x || selectAddressStyle === x) {
-              clearAddress();
-              setSelectAddressStyle(null);
-            }
-          }
-        } catch (e) {
-          console.log("the error is :", e);
-          Swal.fire(t('Profile.error'), t('Profile.deleteError'), "error");
-        }
-      }
-    });
-  };
-
-  const handeleChooseAddress = (item) => {
-    const theSelectedAddress = {
-      id: item.id,
-      address: item.address,
-      name: item.name
-    }
-    addnewadd(theSelectedAddress)
-    setSelectAddressStyle(item.id)
-  }
 
   return (
     <div className='container_feedBack' dir={currentLanguage === 'ar' ? 'rtl' : 'ltr'}>
@@ -241,7 +114,7 @@ const fetchAddresses = async () => {
         </p>
 
         <div onClick={handleAddress} className='address_sec'>
-          <h2 className={ currentLanguage == 'en'? `arow ` : 'arowAR' }  > &gt; </h2>
+          <h2 className={currentLanguage == 'en' ? `arow ` : 'arowAR'}  > &gt; </h2>
           <h4>{t('Profile.addresses')}</h4>
           <p>{t('Profile.addOrRemove')}</p>
         </div>
@@ -260,189 +133,32 @@ const fetchAddresses = async () => {
       </div>
 
       {popUp && (
-        <div className="overlay" onClick={() => setPopUp(false)}>
-          <div className="myModal" role="document" onClick={(e) => e.stopPropagation()} >
-            <div className="modal_header">
-              <h2> {t('Profile.addresses')} </h2>
-              <button
-                className="close-btn"
-                aria-label="Close popup"
-                onClick={() => setPopUp(false)}
-              >
-                &times;
-              </button>
-            </div>
-            <div className="modal_body">
-              <div>
-                {addressMessage.length === 0 ? (
-                  <p className="no-address">{t('Profile.noAddresses')}</p>
-                ) : (
-                  addressMessage.map((msg) => (
-                    <div key={msg.id} className={`the_addresses ${selectAddressStyle === msg.id ? 'active_address ' : ''} `} 
-                    onClick={() => handeleChooseAddress(msg)} >
-                      <p className='topOfTheMessage'>
-                        {msg.name}
-                        <button
-                          className={currentLanguage=="en"? "close-btn delet_add":"close-btn delet_addAR" }
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handeleDelet(msg.id)
-                          }}
-                        >
-                          <FaRegTrashAlt className=' fs-5 '  />
-                        </button>
-                      </p>
-                      <p className='AddressMessage'>{msg.address}</p>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-            <div className="modal-actions">
-              <button className="btn-secondary" onClick={() => setPopUp(false)}>
-                {t('Profile.cancel')}
-              </button>
-              <button onClick={handeleAddAddress} >
-                {t('Profile.add')}
-              </button>
-            </div>
-          </div>
-        </div>
+        <AddressModal
+          setPopUp={setPopUp}
+          setAddAddress={setAddAddress}
+          setCityNameId={setCityNameId}
+          addressMessage={addressMessage}
+          setAddressMessage={setAddressMessage}
+          fetchAddresses={fetchAddresses}
+          Profile = {true}
+
+        />
       )}
 
       {addAddress && (
-        <div className="overlay" onClick={() => handleAddress()} >
-          <div className="myModal" role="document" onClick={(e) => e.stopPropagation()}>
-            <div className="modal_header">
-              <h2>{t('Profile.addAddresses')}</h2>
-              <p className={errMessage ? 'error2' : 'donot_show'} > {errMessage} </p>
-              <button
-                className="close-btn"
-                aria-label="Close popup"
-                onClick={() => {
-                  setPopUp(true)
-                  setAddAddress(false)
-                }}
-              >
-                &times;
-              </button>
-            </div>
-
-            <form onSubmit={addNewAddress}>
-              <div className="modal_body">
-                <p className="lable">{t('Profile.city')}</p>
-                <select className="form_AddAddress" required defaultValue="" value={city} onChange={(e) => {
-                  const selectID = e.target.value
-                  setCity(selectID)
-                  setArea("")
-                  handeleCity(selectID)
-                }} >
-                  <option value="" disabled>
-                    {t('Profile.selectCity')}
-                  </option>
-                  {cityNameId.map((mes) => (
-                    <option key={mes.id} value={mes.id} >{getDisplayName(mes)}</option>
-                  ))}
-                </select>
-
-                <p className="lable">{t('Profile.area')}</p>
-                <select className="form_AddAddress form_add2" required defaultValue="" value={area} onChange={(e) => {
-                  const ar = e.target.value
-                  setArea(ar)
-                  console.log(ar)
-                }} disabled={!city} >
-                  <option value="" disabled>
-                    {t('Profile.selectArea')}
-                  </option>
-                  {areaContainer.map((mes) => (
-                    <option key={mes.id} value={mes.id} >{getDisplayName(mes)}</option>
-                  ))}
-                </select>
-
-                <p className="lable">{t('Profile.street')}</p>
-                <input type="text" className="form_AddAddress" required value={street} onChange={(e) => setStreet(e.target.value)} />
-
-                <p className="lable">{t('Profile.building')}</p>
-                <input type="text" className="form_AddAddress" required value={bulding} onChange={(e) => setBulding(e.target.value)} />
-
-                <p className="lable">{t('Profile.floor')}</p>
-                <input type="text" className="form_AddAddress" required value={floor} onChange={(e) => setFloor(e.target.value)} />
-
-                <p className="lable">{t('Profile.apartment')}</p>
-                <input type="text" className="form_AddAddress" required value={Apartment} onChange={(e) => setApartment(e.target.value)} />
-
-                <div className='home_work_other' >
-                  <button type="button" onClick={() => {
-                    setAddName("")
-                    setAddName("Home")
-                    setOther(false)
-                  }}>{t('Profile.home')}</button>
-                  <button type="button" onClick={() => {
-                    setAddName("")
-                    setAddName("Work")
-                    setOther(false)
-                  }}>{t('Profile.work')}</button>
-                  <button type="button" onClick={() => {
-                    setOther(true);
-                    setAddName("");
-                  }}>{t('Profile.other')}</button>
-                </div>
-
-                {other && (
-                  <div>
-                    <p className="lable">{t('Profile.other')}</p>
-                    <input
-                      type="text"
-                      required
-                      value={addName}
-                      onChange={(e) => setAddName(e.target.value)} 
-                      className='form_AddAddress'
-                      placeholder={t('Profile.enterAddressName')}
-                    />
-                  </div>
-                )}
-              </div>
-
-              <div className="modal-actions">
-                <button
-                  type="button"
-                  className="btn-secondary"
-                  onClick={() => {
-                    setAddAddress(false)
-                    setPopUp(true)
-                  }}
-                >
-                  {t('Profile.cancel')}
-                </button>
-
-                <LoadingButton
-                  type="submit"
-                  size="small"
-                  loading={loading}
-                  variant="outlined"
-                  className='the_button2'
-                  sx={{
-                    backgroundColor: "#f44336",
-                    color: "#fff",
-                    border: "none",
-                    padding: "8px 14px",
-                    borderRadius: "8px",
-                    fontWeight: "500",
-                    cursor: "pointer",
-                    border: "2px solid #f44336",
-                    transition: "background 0.2s ease"
-                  }}
-                >
-                  {t('Profile.addAddress')}
-                </LoadingButton>
-              </div>
-            </form>
-          </div>
-        </div>
+        <AddAddresses
+          setPopUp={setPopUp}
+          setAddAddress={setAddAddress}
+          setCityNameId={setCityNameId}
+          cityNameId={cityNameId}
+          addressMessage={addressMessage}
+          setAddressMessage={setAddressMessage}
+          fetchAddresses={fetchAddresses}
+        />
       )}
 
       {errMessage && (
-        <LogInAgain/>
+        <LogInAgain />
       )}
     </div>
   );

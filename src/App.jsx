@@ -22,6 +22,8 @@ import Payment_success from './Pages/Payment_success';
 import Payment_failed from './Pages/Payment_failed';
 import Payment_pending from './Pages/Payment_pending';
 import { useCartStore } from './store/CartStore';
+import AddressModal from './Pages/AddressModal';
+import AddAddresses from './Pages/AddAddresses';
 
 function App() {
 
@@ -54,7 +56,7 @@ const cart = useCartStore((state) => state.cart);
            <Route path='/payment/success' element={ paymentStatus === "success"?  <Payment_success/> :<Navigate to={'/'} replace /> } />
            <Route path='/payment/failed' element={paymentStatus == "failed" ?<Payment_failed/> :<Navigate to={'/'} replace /> }     />
            <Route path='/payment/pending' element={paymentStatus == "pending" ?<Payment_pending/> :<Navigate to={'/'} replace />  }   />
- 
+
       </Routes>
 
       <Toaster />

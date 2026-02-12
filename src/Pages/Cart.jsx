@@ -13,8 +13,10 @@ import { useCartAddresses } from '../store/CartStore';
 import LoadingButton from '@mui/lab/LoadingButton';
 import LogInAgain from './LogInAgain';
 import Swal from 'sweetalert2';
+import AddressModal from './AddressModal'
 
 import { useNavigate } from 'react-router-dom';
+import AddAddresses from './AddAddresses';
 
 function Cart() {
   const navigate = useNavigate();
@@ -54,12 +56,12 @@ function Cart() {
   const [other, setOther] = useState(false)
 
   const [errMessage, setErrMessage] = useState(false)
-  const [selectAddressStyle, setSelectAddressStyle] = useState(addresscontainer?.id || null)
+  const [selectAddressStyle, setSelectAddressStyle] = useState(null)
 
   const [brachs, setBranchs] = useState([])
   const [SelectedBranch, setSelectedBranch] = useState('')
 
-  const [theShop, setTheShop] = useState(0)
+
 
 
   const cleare = useCartStore((state) => state.clearProducts)
@@ -70,6 +72,8 @@ function Cart() {
   const [couponError, setCouponError] = useState("");
   const [isLoadingCoupon, setIsLoadingCoupon] = useState(false);
   const [cancel, setCancel] = useState(false)
+  const { t, i18n } = useTranslation();
+  const currentLanguage = i18n.language;
 
 
   const handleApplyCoupon = async () => {
@@ -102,7 +106,7 @@ function Cart() {
       setIsLoadingCoupon(false);
     }
   };
-
+///////////////////////////////////////////////////
 
   const handleCancelCoupon = () => {
     setCoupon("");
@@ -110,7 +114,7 @@ function Cart() {
     setCouponError("");
     setCancel(false)
   };
-
+////////////////////////////
 
   const handel_tax = async () => {
     try {
@@ -122,7 +126,7 @@ function Cart() {
 
     }
   }
-
+/////////////////////////
   const handeleDelet = async (id) => {
     const swalWithBootstrapButtons = Swal.mixin({
       customClass: {
@@ -151,8 +155,6 @@ function Cart() {
   };
 
 
-  const { t, i18n } = useTranslation();
-  const currentLanguage = i18n.language;
 
   // Helper function to get display name based on current language
   const getDisplayName = (item) => {
@@ -168,8 +170,8 @@ function Cart() {
 
   const deliveryFee = pickup
     ? 0
-    : typeof addresscontainer?.deliveryFee === "number"
-      ? addresscontainer.deliveryFee
+    : addresscontainer
+      ? addresscontainer.deliveryFee ?? 70
       : 0;
 
   const taxRate = tax3 / 100;
@@ -201,119 +203,23 @@ function Cart() {
             name: addr.address_name,
             address: addr.address1,
             id: addr.id,
-            deliveryFee: addr?.area?.area_branches?.delivery_fees ?? 70
+            deliveryFee: addr?.area?.area_branches?.[0]?.delivery_fees ?? 70
 
           }));
           setAddressMessage(addresses);
+          //////////////////////////////// if there is one address 
+          if (addresses.length === 1) {
+            addnewadd(addresses[0]);
+            setSelectAddressStyle(addresses[0].id);
+          }
         }
       } catch (e) {
         console.log("the error is :", e);
       }
     }
   };
-
-  useEffect(() => {
-    fetchAddresses();
-    handel_tax()
-    console.log(addresscontainer);
-
-
-  }, []);
-
-  ///////////////////////////////////////////////////////////
-  const handeleChooseAddress = (item) => {
-    const theSelectedAddress = {
-      id: item.id,
-      address: item.address,
-      name: item.name,
-      deliveryFee: item.deliveryFee || 60
-    }
-    addnewadd(theSelectedAddress)
-    setSelectAddressStyle(item.id)
-  }
-
-  const handleAddress = () => {
-    setPopUp(true)
-    setAddAddress(false)
-  };
-
-  //////////////////////////////////////////////////////////////
-  const handeleCity = async (x) => {
-    try {
-      const res = await axios.get(`${URL}/areas?city=${x}`);
-      const mes = res.data.data.areas.map((area) => ({
-        name: area.area_name_en,
-        namear: area.area_name_ar,
-        id: area.id
-      }))
-      setAreaContainer(mes)
-    } catch (e) {
-      console.log("the error is :", e);
-    }
-  };
-  //////////////////////////////////////////////////////////////
-
-  const handeleAddAddress = async () => {
-    setPopUp(false)
-    setAddAddress(true)
-    try {
-      const res = await axios.get(`${URL}/cities`)
-      const x = res.data.data.cities.map(city => ({
-        name: city.name_en,
-        namear: city.name_ar,
-        id: city.id
-      }))
-      setCityNameId(x)
-    } catch (e) {
-      console.log("the error :", e)
-    }
-  }
-  //////////////////////////////////////////////////////////////
-
-  const addNewAddress = async (e) => {
-    e.preventDefault()
-    if (
-      !area?.trim() ||
-      !street?.trim() ||
-      !bulding?.trim() ||
-      !floor?.trim() ||
-      !Apartment?.trim() ||
-      !addName?.trim()
-    ) {
-      toast.error(t('Cart.completeRequirements'))
-      return;
-    }
-    else {
-      setLoading(true)
-      try {
-        const Basicurl = `${URL}/profile/address/add?area=${area}&street=${street}&building=${bulding}&floor=${floor}&apt=${Apartment}&name=${addName}&lat=20.222222&lng=30.333333&api_token=${token}`
-        console.log("Basicurl:", Basicurl);
-        const res = await axios.post(`${Basicurl}`);
-        console.log("Address added successfully:", res.data);
-
-        // Reset form after success
-        setArea("");
-        setStreet("");
-        setBulding("");
-        setFloor("");
-        setApartment("");
-        setAddName("");
-        setErrMessage(false);
-
-        setAddAddress(false);
-        await fetchAddresses()
-        toast.success(t('Cart.addSuccess'))
-        setPopUp(true)
-      } catch (e) {
-        console.error("Error adding address:", e);
-      } finally {
-        setLoading(false)
-      }
-    }
-  };
-  //////////////////////////////////////////////////////////////
-
-  const handelpickup = async () => {
+  /////////////////////////////////////////
+    const handelpickup = async () => {
     const res = await axios.get(`${URL}/branches/1`)
     const allBranches = res.data.data.branches.map((bran) => ({
       name: bran.name_en,
@@ -322,15 +228,8 @@ function Cart() {
     }))
     setBranchs(allBranches)
   }
-  //////////////////////////////////////////////////////////////
-
-  useEffect(() => {
-    handelpickup()
-  }, [])
-
-  ///////////////////////////////////////////////////
-
-
+  //////////////////////////////////////
+  
   const handelOrder = async () => {
 
     if (!token) {
@@ -419,18 +318,36 @@ function Cart() {
 
 
   }
-  /////////////////////////////////////
+
+
+  /////////////////////////////////////////////////
+
+  useEffect(() => {
+    fetchAddresses();
+  }, [token]);
+
+  useEffect(() => {
+    handel_tax();
+    handelpickup()
+    
+
+  }, []);
+
+  useEffect(() => {
+    setSelectAddressStyle(addresscontainer?.id || null)
+  }, [addresscontainer])
+
   useEffect(() => {
     setTotal(total);
   }, [total]); // to store the total and use it in the payment page 
-
 
   useEffect(() => {
     console.log("canPay:", canPay);
   }, [canPay]);
 
+  
 
-  /////////////////////////////////////////////////
+
   return (
     <div className='cart_container' dir={currentLanguage === 'ar' ? 'rtl' : 'ltr'}>
       {/* /////////////nav bar /////////////////////// */}
@@ -491,7 +408,7 @@ function Cart() {
             >
               <option value="" disabled>{t('Cart.selectBranch')}</option>
               {brachs.map((branch) => (
-                <option key={branch.id} value={branch.id} onClick={() => { setTheShop(brachs.id) }} >
+                <option key={branch.id} value={branch.id} onClick={() => setTheShop(branch.id)} >
                   {getDisplayName(branch)}
                 </option>
               ))}
@@ -599,154 +516,80 @@ function Cart() {
           <hr />
           {/* ////////////////////////////////////////////////////////////////////////////////////////////////// */}
 
-          {/* <div className='coupon_section' style={{
-            width: "100%",
 
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}>
-            <input
-              type="text"
-              placeholder={t('Apply.placeHolder')}
-              style={{ marginTop: "5px", width: "70%", border: "1px solid black" }}
-              value={coupon}
-              className='input'
-              onChange={(e) => {
-                setCoupon(e.target.value)
-                setCancel(false)
-              }
-              }
-            />
-
-          
-            {!cancel && (
-              <Button
-                size="small"
-                loading={loading}
-                onClick={handleApplyCoupon}
-                variant="outlined"
-                className='the_button2'
-                sx={{
-                  width: "20%",
-                  marginTop: "3px",
-                  backgroundColor: "#f44336",
-                  border: "3px solid #f44336",
-                  color: "white",
-                  fontWeight: 700,
-                  borderRadius: "0px",
-                  padding: "8px 8px",
-                  cursor: "pointer",
-                  transition: "0.5s",
-                }}
-              >
-                {t('Apply.Apply')}
-              </Button>
-            )}
-
-            {cancel && (
-              <Button
-                size="small"
-                onClick={handleCancelCoupon}
-                variant="outlined"
-                sx={{
-                  width: "20%",
-                  marginTop: "-2px",
-                  backgroundColor: "gray",
-                  border: "3px solid gray",
-                  color: "white",
-                  fontWeight: 700,
-                  borderRadius: "0px",
-                  padding: "8px 8px",
-                  cursor: "pointer",
-                  transition: "0.5s",
-                }}
-              >
-                {t('cancel')}
-              </Button>
-            )}
-
-            {couponError && <p style={{ color: "red" }}>{couponError}</p>}
-            {discount > 0 && (
-              <p style={{ color: "red" }}>
-                {`you have ${discount}% discount`}
-              </p>
-            )}
-
-          </div> */}
 
           <div className="coupon_wrapper">
-  <div className="coupon_box">
-    <input
-      type="text"
-      placeholder={t('Apply.placeHolder')}
-      value={coupon}
-      className="coupon_input"
-      onChange={(e) => {
-        setCoupon(e.target.value);
-        setCancel(false);
-      }}
-    />
-
-    {!cancel && (
-              <Button
-                size="small"
-                loading={loading}
-                onClick={handleApplyCoupon}
-                variant="outlined"
-                className='the_button2'
-                sx={{
-                  width: "20%",
-                 
-                  marginTop: "20px",
-                  backgroundColor: "#f44336",
-                  border: "3px solid #f44336",
-                  color: "white",
-                  fontWeight: 700,
-                  borderRadius: "0px",
-                  padding: "8px 8px",
-                  cursor: "pointer",
-                  transition: "0.5s",
+            <div className="coupon_box">
+              <input
+                type="text"
+                placeholder={t('Apply.placeHolder')}
+                value={coupon}
+                className="coupon_input"
+                onChange={(e) => {
+                  setCoupon(e.target.value);
+                  setCancel(false);
                 }}
-              >
-                {t('Apply.Apply')}
-              </Button>
+              />
+
+              {!cancel && (
+                <Button
+                  size="small"
+                  loading={loading}
+                  onClick={handleApplyCoupon}
+                  variant="outlined"
+                  className='the_button2'
+                  sx={{
+                    width: "20%",
+
+                    marginTop: "20px",
+                    backgroundColor: "#f44336",
+                    border: "3px solid #f44336",
+                    color: "white",
+                    fontWeight: 700,
+                    borderRadius: "0px",
+                    padding: "8px 8px",
+                    cursor: "pointer",
+                    transition: "0.5s",
+                  }}
+                >
+                  {t('Apply.Apply')}
+                </Button>
+              )}
+
+              {cancel && (
+                <Button
+                  size="small"
+                  onClick={handleCancelCoupon}
+                  variant="outlined"
+                  sx={{
+                    width: "20%",
+                    marginTop: "-2px",
+                    backgroundColor: "gray",
+                    border: "3px solid gray",
+                    color: "white",
+                    fontWeight: 700,
+                    borderRadius: "0px",
+                    padding: "8px 8px",
+                    cursor: "pointer",
+                    transition: "0.5s",
+                  }}
+                >
+                  {t('cancel')}
+                </Button>
+              )}
+
+            </div>
+
+            {couponError && (
+              <p className="coupon_message error">{couponError}</p>
             )}
 
-   {cancel && (
-              <Button
-                size="small"
-                onClick={handleCancelCoupon}
-                variant="outlined"
-                sx={{
-                  width: "20%",
-                  marginTop: "-2px",
-                  backgroundColor: "gray",
-                  border: "3px solid gray",
-                  color: "white",
-                  fontWeight: 700,
-                  borderRadius: "0px",
-                  padding: "8px 8px",
-                  cursor: "pointer",
-                  transition: "0.5s",
-                }}
-              >
-                {t('cancel')}
-              </Button>
+            {discount > 0 && (
+              <p className="coupon_message success">
+                {`You have ${discount}% discount 🎉`}
+              </p>
             )}
-
-  </div>
-
-  {couponError && (
-    <p className="coupon_message error">{couponError}</p>
-  )}
-
-  {discount > 0 && (
-    <p className="coupon_message success">
-      {`You have ${discount}% discount 🎉`}
-    </p>
-  )}
-</div>
+          </div>
 
           <br />
 
@@ -796,11 +639,7 @@ function Cart() {
                   <p>{t('Cart.tax')} {Math.floor(tax3)}%</p>
                   <p>{tax2.toFixed(2)} {t('Cart.egp')}</p>
                 </div>
-                {/*        
-                          <div>
-                  <p>{t('Cart.coupon')} </p>
-                  <p>{Math.floor(discount)}%</p>
-                </div> */}
+ 
                 <hr />
                 <div>
                   <h4>{t('Cart.total')}</h4>
@@ -873,205 +712,34 @@ function Cart() {
       </div>
 
       {popUp && (
-        <div className="overlay" onClick={() => setPopUp(false)}>
-          <div className="myModal" role="document" onClick={(e) => e.stopPropagation()} >
-            <div className="modal_header">
-              <h2> {t('Cart.addresses')} </h2>
-              <button
-                className="close-btn"
-                aria-label="Close popup"
-                onClick={() => setPopUp(false)}
-              >
-                &times;
-              </button>
-            </div>
-            <div className="modal_body">
-              <div>
-                {addressMessage.length === 0 ? (
-                  <p className="no-address">{t('Cart.noAddressesYet')}</p>
-                ) : (
-                  addressMessage.map((msg) => (
-                    <div key={msg.id} className={`the_addresses ${selectAddressStyle === msg.id ? 'active_address ' : ''} `} onClick={() => handeleChooseAddress(msg)} >
-                      <p className='topOfTheMessage'>
-                        {msg.name}
-                      </p>
-                      <p className='AddressMessage'>{msg.address}</p>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-            <div className="modal-actions">
-              <button className="btn-secondary" onClick={() => setPopUp(false)}>
-                {t('Cart.cancel')}
-              </button>
-              <button onClick={handeleAddAddress} >
-                {t('Cart.add')}
-              </button>
-            </div>
-          </div>
-        </div>
+        
+        <AddressModal
+          setPopUp={setPopUp}
+          setAddAddress={setAddAddress}
+          setCityNameId={setCityNameId}
+          addressMessage={addressMessage}
+          setAddressMessage={setAddressMessage}
+          fetchAddresses={fetchAddresses}
+          Profile={false}
+
+        />
       )}
 
       {addAddress && (
-        <div className="overlay" onClick={() => handleAddress()} >
-          <div className="myModal" role="document" onClick={(e) => e.stopPropagation()}>
-            <div className="modal_header">
-              <h2>{t('Cart.addAddresses')}</h2>
-              <button
-                className="close-btn"
-                aria-label="Close popup"
-                onClick={() => {
-                  setPopUp(true)
-                  setAddAddress(false)
-                }}
-              >
-                &times;
-              </button>
-            </div>
-            <form onSubmit={addNewAddress}>
-              <div className="modal_body">
-                <p className="lable">{t('Cart.city')}</p>
-                <select className="form_AddAddress" required defaultValue="" value={city} onChange={(e) => {
-                  const selectID = e.target.value
-                  setCity(selectID)
-                  setArea("")
-                  handeleCity(selectID)
-                }} >
-                  <option value="" disabled>{t('Cart.selectCity')}</option>
-                  {cityNameId.map((mes) => (
-                    <option key={mes.id} value={mes.id} >{getDisplayName(mes)}</option>
-                  ))}
-                </select>
 
-                <p className="lable">{t('Cart.area')}</p>
-                <select className="form_AddAddress form_add2" required defaultValue="" value={area} onChange={(e) => {
-                  const ar = e.target.value
-                  setArea(ar)
-                }} disabled={!city} >
-                  <option value="" disabled>{t('Cart.selectArea')}</option>
-                  {areaContainer.map((mes) => (
-                    <option key={mes.id} value={mes.id} >{getDisplayName(mes)}</option>
-                  ))}
-                </select>
-
-                <p className="lable">{t('Cart.street')}</p>
-                <input type="text" className="form_AddAddress" required value={street} onChange={(e) => setStreet(e.target.value)} />
-
-                <p className="lable">{t('Cart.building')}</p>
-                <input type="text" className="form_AddAddress" required value={bulding} onChange={(e) => setBulding(e.target.value)} />
-
-                <p className="lable">{t('Cart.floor')}</p>
-                <input type="text" className="form_AddAddress" required value={floor} onChange={(e) => setFloor(e.target.value)} />
-
-                <p className="lable">{t('Cart.apartment')}</p>
-                <input type="text" className="form_AddAddress" required value={Apartment} onChange={(e) => setApartment(e.target.value)} />
-
-                <div className='home_work_other' >
-                  <button type="button" onClick={() => {
-                    setAddName("")
-                    setAddName("Home")
-                    setOther(false)
-                  }}>{t('Cart.home')}</button>
-                  <button type="button" onClick={() => {
-                    setAddName("")
-                    setAddName("Work")
-                    setOther(false)
-                  }}>{t('Cart.work')}</button>
-                  <button type="button" onClick={() => {
-                    setOther(true);
-                    setAddName("");
-                  }}>{t('Cart.other')}</button>
-                </div>
-
-                {other && (
-                  <div>
-                    <p className="lable">{t('Cart.other')}</p>
-                    <input
-                      type="text"
-                      required
-                      value={addName}
-                      onChange={(e) => setAddName(e.target.value)}
-                      className='form_AddAddress'
-                      placeholder={t('Cart.enterAddressName')}
-                    />
-                  </div>
-                )}
-              </div>
-              <div className="modal-actions">
-                <button
-                  type="button"
-                  className="btn-secondary"
-                  onClick={() => {
-                    setAddAddress(false)
-                    setPopUp(true)
-                  }}
-                >
-                  {t('Cart.cancel')}
-                </button>
-                <LoadingButton
-                  type="submit"
-                  size="small"
-                  loading={loading}
-                  variant="outlined"
-                  className='the_button2'
-                  sx={{
-                    backgroundColor: "#f44336",
-                    color: "#fff",
-                    border: "none",
-                    padding: "8px 14px",
-                    borderRadius: "8px",
-                    fontWeight: "500",
-                    cursor: "pointer",
-                    border: "2px solid #f44336",
-                    transition: "background 0.2s ease"
-                  }}
-                >
-                  {t('Cart.addAddress')}
-                </LoadingButton>
-              </div>
-            </form>
-          </div>
-        </div>
+                <AddAddresses
+                  setPopUp={setPopUp}
+                  setAddAddress={setAddAddress}
+                  setCityNameId={setCityNameId}
+                  cityNameId={cityNameId}
+                  addressMessage={addressMessage}
+                  setAddressMessage={setAddressMessage}
+                  fetchAddresses={fetchAddresses}
+                />
       )}
 
 
-      {/* {!loginPlease && (
 
- 
-           <div className="overlay" onClick={() => setLoginPlease(true)}>
-          <div className="myModal" role="document" onClick={(e) => e.stopPropagation()} >
-            <div className="modal_header">
-              <h2> {t('Cart.Login')} </h2>
-              <button
-                className="close-btn"
-                aria-label="Close popup"
-                onClick={() => setLoginPlease(true)}
-              >
-                &times;
-              </button>
-            </div>
-            <div className="modal_body">
-              <div>
-              
-                  <p className="no-address">{t('Cart.LoginPlease')}</p>
-            
-                
-              </div>
-            </div>
-            <div className="modal-actions">
-              <button className="btn-secondary"   onClick={() => setLoginPlease(true)}>
-                {t('Cart.cancel')}
-              </button>
-              <button onClick={() => {navigate('/Login')}} >
-                {t('Login.title')}
-              </button>
-            </div>
-          </div>
-        </div>
-      
-
-     )} */}
 
       {/* //////////////////////////////////////////////////////// */}
       {errMessage && (
