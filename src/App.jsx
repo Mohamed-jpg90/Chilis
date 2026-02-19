@@ -24,9 +24,9 @@ import Payment_pending from './Pages/Payment_pending';
 import { useCartStore } from './store/CartStore';
 import AddressModal from './Pages/AddressModal';
 import AddAddresses from './Pages/AddAddresses';
-
+import { QueryClientProvider , QueryClient } from 'react-query';
 function App() {
-
+const queryClient = new QueryClient()  
 const canpay = useCartStore((state) => state.canPay);
 const paymentStatus = useCartStore((state) => state.paymentStatus);
 const cart = useCartStore((state) => state.cart);
@@ -41,6 +41,7 @@ const cart = useCartStore((state) => state.cart);
   };
 
   return (
+    <QueryClientProvider client={queryClient} >
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<Home2 />} />
@@ -62,6 +63,7 @@ const cart = useCartStore((state) => state.cart);
       <Toaster />
 
     </BrowserRouter>
+    </QueryClientProvider>
   );
 }
 

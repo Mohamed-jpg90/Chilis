@@ -13,6 +13,7 @@ import "swiper/css/navigation";
 import { FaChevronCircleRight } from "react-icons/fa";
 import { FaChevronCircleLeft } from "react-icons/fa";
 import { useTranslation } from 'react-i18next';
+import { QueryClientProvider, useQuery } from 'react-query';
 
 const URL = "https://myres.me/chilis-dev/api";
 
@@ -21,8 +22,8 @@ function MenueSec() {
     const cart = useCartStore((state) => state.cart);
     const addToCart = useCartStore((state) => state.addToCart);
 
-    const [menuData, setMenuData] = useState([]);
-    const [itemData, setItemData] = useState([])
+    // const [menuData, setMenuData] = useState([]);
+    // const [itemData, setItemData] = useState([])
     const [showItem, setShowItem] = useState(false)
     const [showPupUp, setShowPupUp] = useState(false)
     const [idItem, setIdItem] = useState('')
@@ -37,55 +38,105 @@ function MenueSec() {
     const currentLanguage = i18n.language;
 
 
+    // const fetchMenu = async () => {
 
-    const fetchMenu = async () => {
-        try {
-            const res = await axios.get(`${URL}/menu/10/1`);
-            const menuSections = res.data.data.menu[0].sections.map(section => ({
-                id: section.id,
-                name: section.name_en,
-                namear: section.name_ar,
-                image: `https://myres.me/chilis/${section.image}`,
-            }));
-            setMenuData(menuSections);
-        } catch (e) {
-            console.error("The error is:", e);
-        }
-    };
+    //     try {
+    //         const res = await axios.get(`${URL}/menu/10/1`);
+    //         const menuSections = res.data.data.menu[0].sections.map(section => ({
+    //             id: section.id,
+    //             name: section.name_en,
+    //             namear: section.name_ar,
+    //             image: `https://myres.me/chilis/${section.image}`,
+    //         }));
+    //         setMenuData(menuSections);
+    //     } catch (e) {
+    //         console.error("The error is:", e);
+    //     }
+    // };
 
-    useEffect(() => {
-        fetchMenu();
-    }, []);
+    // useEffect(() => {
+    //     fetchMenu();
+    // }, []);
+
+    // const gitItem = async (_id) => {
+    //     try {
+    //         const res = await axios.get(`${URL}/menu/10/2`)
+    //         const itemssss = res.data.data.menu[0].sections.find((item) => item.id === _id)
+    //         if (!itemssss) {
+    //             console.log("items can't found ")
+    //         } else {
+    //             const ItemData2 = itemssss.items.map((e) => ({
+    //                 name: e.name_en,
+    //                 namear: e.name_ar,
+    //                 id: e.id,
+    //                 image: `https://myres.me/chilis/${e.image}`,
+    //                 price: e.info[0].price.price
+    //             }))
+    //             setShowItem(true)
+    //             setItemData(ItemData2)
+    //             setIdItem(_id)
+    //             setCategoryName(itemssss.name_en)
+    //             setCategoryNameAr(itemssss.name_ar)
+    //             console.log(categoryName)
+    //         }
+    //     } catch (e) {
+    //         console.log("the error is :", e)
+    //     }
+    // }
+
+    const fetchmenu = async () => {
+        const res = await axios.get(`${URL}/menu/10/1`);
+        return res.data.data.menu[0].sections.map(section => ({
+            id: section.id,
+            name: section.name_en,
+            namear: section.name_ar,
+            image: `https://myres.me/chilis/${section.image}`,
+        }));
+
+
+    }
+    const {
+        isLoading: menuLoading,
+        data: menuData = [],
+        error: itemsError
+
+    } = useQuery('menu', fetchmenu)
+
+
 
     const Backtomenu = () => {
         setShowItem(false)
     }
 
-    const gitItem = async (_id) => {
-        try {
-            const res = await axios.get(`${URL}/menu/10/2`)
-            const itemssss = res.data.data.menu[0].sections.find((item) => item.id === _id)
-            if (!itemssss) {
-                console.log("items can't found ")
-            } else {
-                const ItemData2 = itemssss.items.map((e) => ({
-                    name: e.name_en,
-                    namear: e.name_ar,
-                    id: e.id,
-                    image: `https://myres.me/chilis/${e.image}`,
-                    price: e.info[0].price.price
-                }))
-                setShowItem(true)
-                setItemData(ItemData2)
-                setIdItem(_id)
-                setCategoryName(itemssss.name_en)
-                setCategoryNameAr(itemssss.name_ar)
-                console.log(categoryName)
-            }
-        } catch (e) {
-            console.log("the error is :", e)
+    const fetchItems = async (categoryId) => {
+        const res = await axios.get(`${URL}/menu/10/2`);
+        const section = res.data.data.menu[0].sections.find(s => s.id === categoryId);
+
+        return section.items.map(item => ({
+            id: item.id,
+            name: item.name_en,
+            namear: item.name_ar,
+            image: `https://myres.me/chilis/${item.image}`,
+            price: item.info[0].price.price
+        }));
+    };
+
+
+    const {
+        data: itemData = [],
+        isLoading: itemsLoading
+    } = useQuery(
+        ['items', idItem],
+        () => fetchItems(idItem),
+        {
+            enabled: !!idItem
         }
-    }
+    );
+
+    const gitItem = (id) => {
+        setIdItem(id);
+        setShowItem(true);
+    };
 
     const openItemPopUp = async (itemId) => {
         try {
@@ -164,6 +215,8 @@ function MenueSec() {
         setSelectedExtras([]);
         setSelectedOption(null);
     };
+
+    
     /////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Helper function to get display name based on current language
@@ -184,60 +237,66 @@ function MenueSec() {
                 <div className='line mx-auto ' ></div>
 
                 {!showItem && (
-                    menuData.length === 0 ? (
-                        <div className='loding_bage'>
-                            <h2>{t('menu.loadingMenu')}</h2>
-                        </div>
-                    ) : (
-                        <div className='container_herzontal'>
-                            {currentLanguage === 'ar' ? (
-                                <>
-                                    <div className="custom-prev"><FaChevronCircleLeft /></div>
-                                    <div className="custom-next"><FaChevronCircleRight /></div>
 
-                                </>
-                            ) : (
-                                <>
-                                    <div className="custom-prev"><FaChevronCircleLeft /></div>
-                                    <div className="custom-next"><FaChevronCircleRight /></div>
-                                </>
-                            )}
+                    <div className='container_herzontal'>
+                        {menuLoading && (
+                            <div className='loding_bage'>
+                                <h2>{t('menu.loadingMenu')}</h2>
+                            </div>
+                        )}
 
-                            <Swiper
-                                key={i18n.language}
-                                dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
-                                spaceBetween={30}
-                                slidesPerView={1}
-                                autoplay={false}
-                                navigation={{
-                                    nextEl: '.custom-next',
-                                    prevEl: '.custom-prev',
-                                }}
-                                loop={true}
-                                modules={[Autoplay, Pagination, Navigation]}
-                                breakpoints={{
-                                    1024: { slidesPerView: 3 },
-                                    700: { slidesPerView: 2 },
-                                    500: { slidesPerView: 1 },
-                                }}
-                            >
-                                {menuData.map(mes => (
-                                    <SwiperSlide key={mes.id}>
-                                        <div className='item1' onClick={() => gitItem(mes.id)}>
-                                            <div className="image2">
-                                                <LazyLoadImage alt={getDisplayName(mes)} src={mes.image} effect='blur' />
-                                            </div>
-                                            <div className='the_content'>
-                                                <h4>{getDisplayName(mes)}</h4>
-                                            </div>
+                        {itemsError && <h2>Failed to load menu</h2>}
+                        {currentLanguage === 'ar' ? (
+                            <>
+                                <div className="custom-prev"><FaChevronCircleLeft /></div>
+                                <div className="custom-next"><FaChevronCircleRight /></div>
 
+                            </>
+                        ) : (
+                            <>
+                                <div className="custom-prev"><FaChevronCircleLeft /></div>
+                                <div className="custom-next"><FaChevronCircleRight /></div>
+                            </>
+                        )}
+
+                        <Swiper
+
+
+                            key={i18n.language}
+                            dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
+                            spaceBetween={30}
+                            slidesPerView={1}
+                            autoplay={false}
+                            navigation={{
+                                nextEl: '.custom-next',
+                                prevEl: '.custom-prev',
+                            }}
+                            loop={true}
+                            modules={[Autoplay, Pagination, Navigation]}
+                            breakpoints={{
+                                1024: { slidesPerView: 3 },
+                                700: { slidesPerView: 2 },
+                                500: { slidesPerView: 1 },
+                            }}
+                        >
+                            {menuData.map(mes => (
+                                <SwiperSlide key={mes.id}>
+                                    <div className='item1' onClick={() => gitItem(mes.id)}>
+                                        <div className="image2">
+                                            <LazyLoadImage alt={getDisplayName(mes)} src={mes.image} effect='blur' />
                                         </div>
-                                    </SwiperSlide>
-                                ))}
-                            </Swiper>
-                        </div>
-                    )
-                )}
+                                        <div className='the_content'>
+                                            <h4>{getDisplayName(mes)}</h4>
+                                        </div>
+
+                                    </div>
+                                </SwiperSlide>
+                            ))}
+                        </Swiper>
+                    </div>
+                )
+                    // )
+                }
 
                 {showItem && (
                     itemData.length === 0 ? (
